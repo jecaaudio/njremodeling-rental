@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Available Rentals | NJ Remodeling and Rental</title>
+    <meta
+      name="description"
+      content="Search available rental properties from NJ Remodeling and Rental by city, state, bedrooms, and budget."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="assets/favicon.png" />
+    <link rel="apple-touch-icon" href="assets/favicon.png" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="properties-data.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="NJ Remodeling and Rental home">
+        <span class="brand-mark">
+          <img src="assets/favicon.png" alt="" />
+        </span>
+        <span>
+          <strong>NJ Remodeling and Rental</strong>
+          <small>Jansel E. Cutino &middot; Louisville, KY</small>
+        </span>
+      </a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="index.html" data-i18n="navHome">Home</a>
+        <a href="rentals.html" data-i18n="navRentals">Rentals</a>
+        <a href="index.html#services" data-i18n="navServices">Services</a>
+        <a href="index.html#contact" data-i18n="navContact">Contact</a>
+      </nav>
+      <div class="header-actions">
+        <div class="language-switch" aria-label="Language selector">
+          <button type="button" class="language-option is-active" data-lang-choice="en">EN</button>
+          <button type="button" class="language-option" data-lang-choice="es">ES</button>
+        </div>
+        <a class="header-cta" href="tel:+15025540333">502-554-0333</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="rentals-page-hero">
+        <div>
+          <p class="eyebrow" data-i18n="pageEyebrow">Rental search</p>
+          <h1 data-i18n="pageTitle">Find available rentals.</h1>
+          <p data-i18n="pageCopy">
+            Choose a city, state, bedrooms, and budget to see properties that match your search.
+          </p>
+        </div>
+      </section>
+
+      <section class="section rentals-browser">
+        <aside class="rentals-filter-panel">
+          <form id="rentals-filter-form">
+            <label>
+              <span data-i18n="cityLabel">City</span>
+              <input type="text" name="city" placeholder="Louisville" data-i18n-placeholder="cityPlaceholder" />
+            </label>
+            <label>
+              <span data-i18n="stateLabel">State</span>
+              <select name="state">
+                <option value="" data-i18n="anyState">Any state</option>
+                <option value="AL">Alabama</option>
+                <option value="AK">Alaska</option>
+                <option value="AZ">Arizona</option>
+                <option value="AR">Arkansas</option>
+                <option value="CA">California</option>
+                <option value="CO">Colorado</option>
+                <option value="CT">Connecticut</option>
+                <option value="DE">Delaware</option>
+                <option value="FL">Florida</option>
+                <option value="GA">Georgia</option>
+                <option value="HI">Hawaii</option>
+                <option value="ID">Idaho</option>
+                <option value="IL">Illinois</option>
+                <option value="IN">Indiana</option>
+                <option value="IA">Iowa</option>
+                <option value="KS">Kansas</option>
+                <option value="KY">Kentucky</option>
+                <option value="LA">Louisiana</option>
+                <option value="ME">Maine</option>
+                <option value="MD">Maryland</option>
+                <option value="MA">Massachusetts</option>
+                <option value="MI">Michigan</option>
+                <option value="MN">Minnesota</option>
+                <option value="MS">Mississippi</option>
+                <option value="MO">Missouri</option>
+                <option value="MT">Montana</option>
+                <option value="NE">Nebraska</option>
+                <option value="NV">Nevada</option>
+                <option value="NH">New Hampshire</option>
+                <option value="NJ">New Jersey</option>
+                <option value="NM">New Mexico</option>
+                <option value="NY">New York</option>
+                <option value="NC">North Carolina</option>
+                <option value="ND">North Dakota</option>
+                <option value="OH">Ohio</option>
+                <option value="OK">Oklahoma</option>
+                <option value="OR">Oregon</option>
+                <option value="PA">Pennsylvania</option>
+                <option value="RI">Rhode Island</option>
+                <option value="SC">South Carolina</option>
+                <option value="SD">South Dakota</option>
+                <option value="TN">Tennessee</option>
+                <option value="TX">Texas</option>
+                <option value="UT">Utah</option>
+                <option value="VT">Vermont</option>
+                <option value="VA">Virginia</option>
+                <option value="WA">Washington</option>
+                <option value="WV">West Virginia</option>
+                <option value="WI">Wisconsin</option>
+                <option value="WY">Wyoming</option>
+                <option value="DC">Washington, DC</option>
+              </select>
+            </label>
+            <label>
+              <span data-i18n="bedroomsLabel">Bedrooms</span>
+              <select name="bedrooms">
+                <option value="" data-i18n="anyBedrooms">Any</option>
+                <option value="Studio">Studio</option>
+                <option value="1">1+</option>
+                <option value="2">2+</option>
+                <option value="3">3+</option>
+                <option value="4">4+</option>
+              </select>
+            </label>
+            <label>
+              <span data-i18n="budgetLabel">Max budget</span>
+              <input type="text" name="budget" placeholder="Optional" data-i18n-placeholder="budgetPlaceholder" />
+            </label>
+            <button class="button primary" type="submit" data-i18n="filterSubmit">Show matching rentals</button>
+            <button class="button neutral" type="button" id="clear-filters" data-i18n="clearFilters">Clear filters</button>
+          </form>
+        </aside>
+
+        <section class="rentals-results" aria-live="polite">
+          <div class="results-header">
+            <p class="eyebrow" data-i18n="resultsEyebrow">Results</p>
+            <h2 id="results-title">Available properties</h2>
+          </div>
+          <div class="property-grid rentals-results-grid" id="rentals-results-grid"></div>
+          <div class="empty-results" id="empty-results" hidden>
+            <h3 data-i18n="emptyTitle">No published matches yet.</h3>
+            <p data-i18n="emptyCopy">
+              We may still be preparing listings for that city or budget. Send your search and Jansel can follow up.
+            </p>
+            <a class="button primary" id="empty-request-link" href="mailto:njremodelingrental@gmail.com" data-i18n="emptyAction">Send search request</a>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; 2026 NJ Remodeling and Rental. Louisville, KY.</p>
+      <div>
+        <a href="tel:+15025540333">502-554-0333</a>
+        <a href="mailto:njremodelingrental@gmail.com">njremodelingrental@gmail.com</a>
+        <a href="https://www.facebook.com/people/NJ-Remodeling-and-Rental/61574809101327/" target="_blank" rel="noopener noreferrer">Facebook</a>
+        <a href="https://www.tiktok.com/@nj.remodeling.and.rental?is_from_webapp=1&amp;sender_device=pc" target="_blank" rel="noopener noreferrer">TikTok</a>
+      </div>
+    </footer>
+
+    <script>
+      const rentalsTranslations = {
+        en: {
+          navHome: "Home",
+          navRentals: "Rentals",
+          navServices: "Services",
+          navContact: "Contact",
+          pageEyebrow: "Rental search",
+          pageTitle: "Find available rentals.",
+          pageCopy: "Choose a city, state, bedrooms, and budget to see properties that match your search.",
+          cityLabel: "City",
+          cityPlaceholder: "Louisville",
+          stateLabel: "State",
+          anyState: "Any state",
+          bedroomsLabel: "Bedrooms",
+          anyBedrooms: "Any",
+          budgetLabel: "Max budget",
+          budgetPlaceholder: "Optional",
+          filterSubmit: "Show matching rentals",
+          clearFilters: "Clear filters",
+          resultsEyebrow: "Results",
+          resultsTitle: "Available properties",
+          matchCount: "matching rentals",
+          allCount: "properties in inventory",
+          detailsPending: "Details pending",
+          privateCopy: "Public photos, rent, bedrooms, bathrooms, and address need to be added before this listing is fully searchable.",
+          viewZillow: "Open Zillow link",
+          askAbout: "Ask about this rental",
+          viewDetails: "View property details",
+          photoAlt: "Property photo",
+          bedroomUnit: "BR",
+          bathroomUnit: "BA",
+          sqftUnit: "sqft",
+          emptyTitle: "No published matches yet.",
+          emptyCopy: "We may still be preparing listings for that city or budget. Send your search and Jansel can follow up.",
+          emptyAction: "Send search request",
+          mailSubject: "Rental search request from website",
+          mailCity: "City",
+          mailState: "State",
+          mailBedrooms: "Bedrooms",
+          mailBudget: "Max budget"
+        },
+        es: {
+          navHome: "Inicio",
+          navRentals: "Rentas",
+          navServices: "Servicios",
+          navContact: "Contacto",
+          pageEyebrow: "Búsqueda de renta",
+          pageTitle: "Encuentra rentas disponibles.",
+          pageCopy: "Escoge ciudad, estado, habitaciones y presupuesto para ver propiedades que coincidan con tu búsqueda.",
+          cityLabel: "Ciudad",
+          cityPlaceholder: "Louisville",
+          stateLabel: "Estado",
+          anyState: "Cualquier estado",
+          bedroomsLabel: "Habitaciones",
+          anyBedrooms: "Cualquiera",
+          budgetLabel: "Presupuesto máximo",
+          budgetPlaceholder: "Opcional",
+          filterSubmit: "Mostrar rentas compatibles",
+          clearFilters: "Limpiar filtros",
+          resultsEyebrow: "Resultados",
+          resultsTitle: "Propiedades disponibles",
+          matchCount: "rentas compatibles",
+          allCount: "propiedades en inventario",
+          detailsPending: "Detalles pendientes",
+          privateCopy: "Faltan fotos públicas, renta, habitaciones, baños y dirección para que esta propiedad sea totalmente filtrable.",
+          viewZillow: "Abrir enlace de Zillow",
+          askAbout: "Preguntar por esta renta",
+          viewDetails: "Ver detalles de la propiedad",
+          photoAlt: "Foto de la propiedad",
+          bedroomUnit: "hab.",
+          bathroomUnit: "baños",
+          sqftUnit: "pies²",
+          emptyTitle: "No hay coincidencias publicadas todavía.",
+          emptyCopy: "Tal vez todavía estamos preparando propiedades para esa ciudad o presupuesto. Envía tu búsqueda y Jansel puede responderte.",
+          emptyAction: "Enviar búsqueda",
+          mailSubject: "Solicitud de búsqueda de renta desde la página web",
+          mailCity: "Ciudad",
+          mailState: "Estado",
+          mailBedrooms: "Habitaciones",
+          mailBudget: "Presupuesto máximo"
+        }
+      };
+
+      function redfinPhotos(folder, mls, total, start = 1) {
+        return Array.from({ length: total }, (_, index) => index + start).flatMap((photoNumber, index) => {
+          const base = `https://ssl.cdn-redfin.com/photo/185/bigphoto/${folder}/${mls}`;
+          const urls = [`${base}_${photoNumber}.jpg`];
+          if (index > 0) urls.push(`${base}_${start}_${photoNumber}.jpg`);
+          return urls;
+        });
+      }
+
+      function uniquePhotos(photos) {
+        return [...new Set(photos)];
+      }
+
+      const defaultRentals = [
+        {
+          id: "73561400",
+          title: "5903 Jessamine Ln",
+          address: "5903 Jessamine Ln",
+          city: "Louisville",
+          state: "KY",
+          zip: "40258",
+          bedrooms: 3,
+          bathrooms: 1,
+          sqft: 2268,
+          rent: 1780,
+          image: "assets/properties/5903-jessamine.jpg",
+          photos: uniquePhotos([
+            "assets/properties/5903-jessamine.jpg",
+            "https://photos.zillowstatic.com/fp/855b690522816a1e1e962a1f346f2f75-cc_ft_960.jpg",
+            "https://photos.zillowstatic.com/fp/4b21a3846a53b37f9833c802baf3a290-cc_ft_576.jpg",
+            "https://photos.zillowstatic.com/fp/8efb555d4858c9800bec57f6a960f223-cc_ft_576.jpg",
+            "https://photos.zillowstatic.com/fp/a3fecb54eb5cb7a99a0a347dd485da06-cc_ft_576.jpg",
+            "https://photos.zillowstatic.com/fp/c83d1ac150dd50368bb2e4e756872511-cc_ft_576.jpg",
+            ...redfinPhotos("305", "1668305", 47, 0)
+          ]),
+          description: {
+            en: "Classic stone ranch on a large corner lot with an updated kitchen, granite countertops, fresh paint, laminate flooring, and a finished basement for extra living space.",
+            es: "Casa ranch de piedra en lote amplio con cocina renovada, granito, pintura fresca, piso laminado y sótano terminado para más espacio."
+          },
+          zillowUrl: "https://www.zillow.com/homedetails/5903-Jessamine-Ln-Louisville-KY-40258/73561400_zpid/"
+        },
+        {
+          id: "73587912",
+          title: "2205 Elmhurst Ave",
+          address: "2205 Elmhurst Ave",
+          city: "Louisville",
+          state: "KY",
+          zip: "40216",
+          bedrooms: 2,
+          bathrooms: 1,
+          sqft: 710,
+          rent: 1130,
+          image: "assets/properties/2205-elmhurst.jpg",
+          photos: uniquePhotos([
+            "assets/properties/2205-elmhurst.jpg",
+            "https://photos.zillowstatic.com/fp/ad26e9d9599373ecb50288ab09db4836-cc_ft_960.jpg",
+            "https://photos.zillowstatic.com/fp/549a7ce56057a6f04592941d8fb42014-cc_ft_576.jpg"
+          ]),
+          description: {
+            en: "Renovated home on a quiet street off Rockford Lane with a private back yard, convenient location, hardwood flooring, washer and dryer, deck, and porch.",
+            es: "Casa renovada en una calle tranquila cerca de Rockford Lane, con patio privado, buena ubicación, piso de madera, lavadora y secadora, deck y porche."
+          },
+          zillowUrl: "https://www.zillow.com/homedetails/2205-Elmhurst-Ave-Louisville-KY-40216/73587912_zpid/"
+        },
+        {
+          id: "73577696",
+          title: "7903 Canna Dr",
+          address: "7903 Canna Dr",
+          city: "Louisville",
+          state: "KY",
+          zip: "40258",
+          bedrooms: 3,
+          bathrooms: 1,
+          sqft: 1750,
+          rent: 1580,
+          image: "assets/properties/7903-canna.jpg",
+          photos: uniquePhotos([
+            "assets/properties/7903-canna.jpg",
+            "https://photos.zillowstatic.com/fp/816401ad9e6f9db23ec2430bf3b41162-cc_ft_768.webp",
+            "https://photos.zillowstatic.com/fp/a6bfc21b386f3e1144b05eb65b19daa3-cc_ft_384.webp",
+            ...redfinPhotos("543", "1680543", 32)
+          ]),
+          description: {
+            en: "Brick ranch in PRP with fenced back yard, finished basement, attached carport, two-car detached garage, stainless steel appliances, and flexible lower-level space.",
+            es: "Ranch de ladrillo en PRP con patio cercado, sótano terminado, carport, garaje separado para dos carros, electrodomésticos de acero inoxidable y espacio flexible abajo."
+          },
+          zillowUrl: "https://www.zillow.com/homedetails/7903-Canna-Dr-Louisville-KY-40258/73577696_zpid/"
+        },
+        {
+          id: "73547767",
+          title: "103 Scottsdale Blvd",
+          address: "103 Scottsdale Blvd",
+          city: "Louisville",
+          state: "KY",
+          zip: "40214",
+          bedrooms: 3,
+          bathrooms: 2,
+          sqft: 1397,
+          rent: 1590,
+          image: "assets/properties/103-scottsdale.jpg",
+          photos: uniquePhotos([
+            "assets/properties/103-scottsdale.jpg",
+            "https://photos.zillowstatic.com/fp/5a1ca297940492b3fffdd3f8bdfbb04f-cc_ft_960.jpg",
+            "https://photos.zillowstatic.com/fp/7efaaae0c61947daad10e6bb78a67463-cc_ft_576.jpg",
+            "https://photos.zillowstatic.com/fp/ecd65593f332153097882aed0a882025-cc_ft_576.jpg",
+            "https://photos.zillowstatic.com/fp/d6ead7bb860641248f3f45fd9c0ac42f-cc_ft_576.jpg",
+            "https://photos.zillowstatic.com/fp/d1e11fc6afd416a44ae4c74816268f67-cc_ft_576.jpg",
+            ...redfinPhotos("043", "1712043", 35),
+            ...redfinPhotos("612", "1703612", 31)
+          ]),
+          description: {
+            en: "Warm, well-maintained ranch with open kitchen and great room, updated kitchen, pantry, laundry area, covered front porch, patio, privacy-fenced yard, pool, and storage shed.",
+            es: "Ranch acogedor y bien cuidado con cocina abierta, great room, cocina renovada, pantry, laundry, porche cubierto, patio, cerca privada, piscina y shed."
+          },
+          zillowUrl: "https://www.zillow.com/homedetails/103-Scottsdale-Blvd-Louisville-KY-40214/73547767_zpid/"
+        },
+        {
+          id: "73541489",
+          title: "3709 Carpenter Dr",
+          address: "3709 Carpenter Dr",
+          city: "Louisville",
+          state: "KY",
+          zip: "40229",
+          bedrooms: 3,
+          bathrooms: 1.5,
+          sqft: 1134,
+          rent: 1538,
+          image: "https://ssl.cdn-redfin.com/photo/185/bigphoto/443/1616443_1.jpg",
+          fallbackImage: "assets/property-hero.png",
+          photos: uniquePhotos([
+            ...redfinPhotos("443", "1616443", 26)
+          ]),
+          description: {
+            en: "Bright ranch in Silver Heights with three bedrooms, one full bath plus a half bath, an attached garage, porch, chain-link fencing, and a spacious back yard.",
+            es: "Ranch claro en Silver Heights con tres habitaciones, un baño completo y medio baño, garaje, porche, cerca de chain link y un patio amplio."
+          },
+          zillowUrl: "https://www.zillow.com/homedetails/3709-Carpenter-Dr-Louisville-KY-40229/73541489_zpid/"
+        },
+        {
+          id: "73649367",
+          title: "9507 Polaris Dr",
+          address: "9507 Polaris Dr",
+          city: "Louisville",
+          state: "KY",
+          zip: "40229",
+          bedrooms: 3,
+          bathrooms: 1,
+          sqft: 1025,
+          rent: 1522,
+          image: "https://ssl.cdn-redfin.com/photo/185/bigphoto/968/1619968_1.jpg",
+          fallbackImage: "assets/property-hero.png",
+          photos: uniquePhotos([
+            ...redfinPhotos("968", "1619968", 17)
+          ]),
+          description: {
+            en: "Silver Heights ranch with three bedrooms, first-floor living, dining room, kitchen, driveway parking, and major systems reported replaced in recent years.",
+            es: "Ranch en Silver Heights con tres habitaciones, distribución en un solo nivel, comedor, cocina, parqueo en driveway y sistemas principales reportados como reemplazados en años recientes."
+          },
+          zillowUrl: "https://www.zillow.com/homedetails/9507-Polaris-Dr-Louisville-KY-40229/73649367_zpid/"
+        }
+      ];
+
+      const rentals = window.NJProperties ? window.NJProperties.load(defaultRentals) : defaultRentals;
+
+      const filterForm = document.querySelector("#rentals-filter-form");
+      const resultsGrid = document.querySelector("#rentals-results-grid");
+      const emptyResults = document.querySelector("#empty-results");
+      const emptyRequestLink = document.querySelector("#empty-request-link");
+      const resultsTitle = document.querySelector("#results-title");
+      const languageButtons = document.querySelectorAll("[data-lang-choice]");
+
+      const storage = {
+        get(key) {
+          try {
+            return localStorage.getItem(key);
+          } catch {
+            return null;
+          }
+        },
+        set(key, value) {
+          try {
+            localStorage.setItem(key, value);
+          } catch {
+            return;
+          }
+        }
+      };
+
+      let currentLanguage = storage.get("nj-language") || "en";
+
+      function cleanMoney(value) {
+        const amount = String(value || "").replace(/[^\d]/g, "");
+        return amount ? Number(amount) : null;
+      }
+
+      function getFilters() {
+        const formData = new FormData(filterForm);
+        return {
+          city: String(formData.get("city") || "").trim().toLowerCase(),
+          state: String(formData.get("state") || ""),
+          bedrooms: String(formData.get("bedrooms") || ""),
+          budget: cleanMoney(formData.get("budget"))
+        };
+      }
+
+      function propertyMatches(property, filters) {
+        if (filters.city && property.city.toLowerCase() !== filters.city) return false;
+        if (filters.state && property.state !== filters.state) return false;
+        if (filters.bedrooms && property.bedrooms !== null && property.bedrooms < Number(filters.bedrooms)) return false;
+        if (filters.bedrooms && property.bedrooms === null) return false;
+        if (filters.budget && property.rent !== null && property.rent > filters.budget) return false;
+        if (filters.budget && property.rent === null) return false;
+        return true;
+      }
+
+      function mailtoForSearch(filters) {
+        const dictionary = rentalsTranslations[currentLanguage] || rentalsTranslations.en;
+        const subject = encodeURIComponent(dictionary.mailSubject);
+        const body = encodeURIComponent(
+          `${dictionary.mailCity}: ${filters.city || ""}\n` +
+            `${dictionary.mailState}: ${filters.state || ""}\n` +
+            `${dictionary.mailBedrooms}: ${filters.bedrooms || ""}\n` +
+            `${dictionary.mailBudget}: ${filters.budget || ""}`
+        );
+        return `mailto:njremodelingrental@gmail.com?subject=${subject}&body=${body}`;
+      }
+
+      function escapeAttribute(value) {
+        return String(value).replaceAll("&", "&amp;").replaceAll('"', "&quot;");
+      }
+
+      function renderGallery(property, dictionary) {
+        const photos = property.photos && property.photos.length ? property.photos : [property.image];
+        const fallback = escapeAttribute(property.fallbackImage || property.image || "assets/property-hero.png");
+        const mainPhoto = escapeAttribute(photos[0]);
+        const detailUrl = `property.html?id=${encodeURIComponent(property.id)}`;
+        const thumbnails = photos
+          .slice(1, 4)
+          .map((photo, index) => {
+            const safePhoto = escapeAttribute(photo);
+            return `
+              <a class="property-thumb" href="${detailUrl}" aria-label="${dictionary.viewDetails}: ${property.title}">
+                <img src="${safePhoto}" alt="${dictionary.photoAlt} ${index + 2}" onerror="this.closest('.property-thumb').remove()" />
+              </a>
+            `;
+          })
+          .join("");
+
+        return `
+          <div class="property-gallery">
+            <a class="property-gallery-main" href="${detailUrl}" aria-label="${dictionary.viewDetails}: ${property.title}">
+              <img src="${mainPhoto}" alt="${dictionary.photoAlt} 1" onerror="this.onerror=null;this.src='${fallback}'" />
+            </a>
+            ${thumbnails ? `<div class="property-thumbs">${thumbnails}</div>` : ""}
+          </div>
+        `;
+      }
+
+      function renderRentals() {
+        const dictionary = rentalsTranslations[currentLanguage] || rentalsTranslations.en;
+        const filters = getFilters();
+        const hasFilters = Boolean(filters.city || filters.state || filters.bedrooms || filters.budget);
+        const visibleRentals = hasFilters ? rentals.filter((property) => propertyMatches(property, filters)) : [...rentals];
+
+        resultsTitle.textContent = `${visibleRentals.length} ${hasFilters ? dictionary.matchCount : dictionary.allCount}`;
+        resultsGrid.innerHTML = "";
+
+        visibleRentals.forEach((property) => {
+          const card = document.createElement("article");
+          card.className = "property-card";
+          const meta = `${property.city}, ${property.state} ${property.zip}`;
+          const bedrooms = `${property.bedrooms ?? 0} ${dictionary.bedroomUnit}`;
+          const bathrooms = `${property.bathrooms ?? 0} ${dictionary.bathroomUnit}`;
+          const sqft = `${Number(property.sqft || 0).toLocaleString()} ${dictionary.sqftUnit}`;
+          const description = typeof property.description === "string" ? property.description : property.description[currentLanguage] || property.description.en;
+          const zillowLink = property.zillowUrl
+            ? `<a href="${escapeAttribute(property.zillowUrl)}" target="_blank" rel="noopener noreferrer">${dictionary.viewZillow}</a>`
+            : "";
+
+          card.innerHTML = `
+            ${renderGallery(property, dictionary)}
+            <div class="property-content">
+              <span>${meta}</span>
+              <h3>${property.title}</h3>
+              <p>${bedrooms} &middot; ${bathrooms} &middot; ${sqft}</p>
+              <p>${description}</p>
+              <a href="property.html?id=${encodeURIComponent(property.id)}">${dictionary.viewDetails}</a>
+              ${zillowLink}
+              <a href="mailto:njremodelingrental@gmail.com?subject=${encodeURIComponent(dictionary.askAbout + " " + property.id)}">${dictionary.askAbout}</a>
+            </div>
+          `;
+          resultsGrid.appendChild(card);
+        });
+
+        emptyResults.hidden = visibleRentals.length > 0;
+        emptyRequestLink.href = mailtoForSearch(filters);
+      }
+
+      function applyLanguage(language) {
+        const activeLanguage = rentalsTranslations[language] ? language : "en";
+        const dictionary = rentalsTranslations[activeLanguage];
+        currentLanguage = activeLanguage;
+        document.documentElement.lang = activeLanguage;
+
+        document.querySelectorAll("[data-i18n]").forEach((element) => {
+          const key = element.getAttribute("data-i18n");
+          if (dictionary[key]) element.textContent = dictionary[key];
+        });
+
+        document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
+          const key = element.getAttribute("data-i18n-placeholder");
+          if (dictionary[key]) element.setAttribute("placeholder", dictionary[key]);
+        });
+
+        languageButtons.forEach((button) => {
+          const isActive = button.getAttribute("data-lang-choice") === activeLanguage;
+          button.classList.toggle("is-active", isActive);
+          button.setAttribute("aria-pressed", String(isActive));
+        });
+
+        storage.set("nj-language", activeLanguage);
+        renderRentals();
+      }
+
+      function loadFiltersFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        filterForm.elements.city.value = params.get("city") || "";
+        filterForm.elements.state.value = params.get("state") || "";
+        filterForm.elements.bedrooms.value = params.get("bedrooms") || "";
+        filterForm.elements.budget.value = params.get("budget") || "";
+      }
+
+      filterForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const filters = getFilters();
+        const params = new URLSearchParams();
+        if (filters.city) params.set("city", filters.city);
+        if (filters.state) params.set("state", filters.state);
+        if (filters.bedrooms) params.set("bedrooms", filters.bedrooms);
+        if (filters.budget) params.set("budget", String(filters.budget));
+        history.replaceState(null, "", `${window.location.pathname}?${params.toString()}`);
+        renderRentals();
+      });
+
+      document.querySelector("#clear-filters").addEventListener("click", () => {
+        filterForm.reset();
+        history.replaceState(null, "", window.location.pathname);
+        renderRentals();
+      });
+
+      languageButtons.forEach((button) => {
+        button.addEventListener("click", () => applyLanguage(button.getAttribute("data-lang-choice")));
+      });
+
+      loadFiltersFromUrl();
+      applyLanguage(currentLanguage);
+    </script>
+  </body>
+</html>

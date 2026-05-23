@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Property Details | NJ Remodeling and Rental</title>
+    <meta
+      name="description"
+      content="View rental property photos, details, and contact options from NJ Remodeling and Rental."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="assets/favicon.png" />
+    <link rel="apple-touch-icon" href="assets/favicon.png" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="properties-data.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="NJ Remodeling and Rental home">
+        <span class="brand-mark">
+          <img src="assets/favicon.png" alt="" />
+        </span>
+        <span>
+          <strong>NJ Remodeling and Rental</strong>
+          <small>Jansel E. Cutino &middot; Louisville, KY</small>
+        </span>
+      </a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="index.html" data-i18n="navHome">Home</a>
+        <a href="rentals.html" data-i18n="navRentals">Rentals</a>
+        <a href="index.html#services" data-i18n="navServices">Services</a>
+        <a href="index.html#contact" data-i18n="navContact">Contact</a>
+      </nav>
+      <div class="header-actions">
+        <div class="language-switch" aria-label="Language selector">
+          <button type="button" class="language-option is-active" data-lang-choice="en">EN</button>
+          <button type="button" class="language-option" data-lang-choice="es">ES</button>
+        </div>
+        <a class="header-cta" href="tel:+15025540333">502-554-0333</a>
+      </div>
+    </header>
+
+    <main class="property-detail-page">
+      <section class="property-detail-shell" id="property-detail"></section>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; 2026 NJ Remodeling and Rental. Louisville, KY.</p>
+      <div>
+        <a href="tel:+15025540333">502-554-0333</a>
+        <a href="mailto:njremodelingrental@gmail.com">njremodelingrental@gmail.com</a>
+        <a href="https://www.facebook.com/people/NJ-Remodeling-and-Rental/61574809101327/" target="_blank" rel="noopener noreferrer">Facebook</a>
+        <a href="https://www.tiktok.com/@nj.remodeling.and.rental?is_from_webapp=1&amp;sender_device=pc" target="_blank" rel="noopener noreferrer">TikTok</a>
+      </div>
+    </footer>
+
+    <script>
+      const propertyTranslations = {
+        en: {
+          navHome: "Home",
+          navRentals: "Rentals",
+          navServices: "Services",
+          navContact: "Contact",
+          backToRentals: "Back to rentals",
+          detailEyebrow: "Property details",
+          bedroomUnit: "BR",
+          bathroomUnit: "BA",
+          sqftUnit: "sqft",
+          overviewTitle: "About this property",
+          factsTitle: "Home details",
+          addressLabel: "Address",
+          cityStateLabel: "City and state",
+          bedroomsLabel: "Bedrooms",
+          bathroomsLabel: "Bathrooms",
+          sqftLabel: "Square feet",
+          photosTitle: "Photos",
+          sourceNote: "Photos are shown from site files or public listing sources when available.",
+          viewZillow: "Open Zillow link",
+          askAbout: "Ask about this rental",
+          photoAlt: "Property photo",
+          notFoundTitle: "Property not found.",
+          notFoundCopy: "Return to the rentals page and choose a property from the list."
+        },
+        es: {
+          navHome: "Inicio",
+          navRentals: "Rentas",
+          navServices: "Servicios",
+          navContact: "Contacto",
+          backToRentals: "Volver a rentas",
+          detailEyebrow: "Detalles de la propiedad",
+          bedroomUnit: "hab.",
+          bathroomUnit: "baños",
+          sqftUnit: "pies²",
+          overviewTitle: "Sobre esta propiedad",
+          factsTitle: "Detalles de la casa",
+          addressLabel: "Dirección",
+          cityStateLabel: "Ciudad y estado",
+          bedroomsLabel: "Habitaciones",
+          bathroomsLabel: "Baños",
+          sqftLabel: "Pies cuadrados",
+          photosTitle: "Fotos",
+          sourceNote: "Las fotos se muestran desde archivos del sitio o fuentes públicas cuando están disponibles.",
+          viewZillow: "Abrir enlace de Zillow",
+          askAbout: "Preguntar por esta renta",
+          photoAlt: "Foto de la propiedad",
+          notFoundTitle: "Propiedad no encontrada.",
+          notFoundCopy: "Regresa a la página de rentas y escoge una propiedad de la lista."
+        }
+      };
+
+      function redfinPhotos(folder, mls, total, start = 1) {
+        return Array.from({ length: total }, (_, index) => index + start).flatMap((photoNumber, index) => {
+          const base = `https://ssl.cdn-redfin.com/photo/185/bigphoto/${folder}/${mls}`;
+          const urls = [`${base}_${photoNumber}.jpg`];
+          if (index > 0) urls.push(`${base}_${start}_${photoNumber}.jpg`);
+          return urls;
+        });
+      }
+
+      function uniquePhotos(photos) {
+        return [...new Set(photos)];
+      }
+
+      const defaultProperties = [
+        {
+          id: "73561400",
+          title: "5903 Jessamine Ln",
+          address: "5903 Jessamine Ln",
+          city: "Louisville",
+          state: "KY",
+          zip: "40258",
+          bedrooms: 3,
+          bathrooms: 1,
+          sqft: 2268,
+          rent: 1780,
+          fallbackImage: "assets/properties/5903-jessamine.jpg",
+          photos: uniquePhotos([
+            "assets/properties/5903-jessamine.jpg",
+            "https://photos.zillowstatic.com/fp/855b690522816a1e1e962a1f346f2f75-cc_ft_960.jpg",
+            "https://photos.zillowstatic.com/fp/4b21a3846a53b37f9833c802baf3a290-cc_ft_576.jpg",
+            "https://photos.zillowstatic.com/fp/8efb555d4858c9800bec57f6a960f223-cc_ft_576.jpg",
+            "https://photos.zillowstatic.com/fp/a3fecb54eb5cb7a99a0a347dd485da06-cc_ft_576.jpg",
+            "https://photos.zillowstatic.com/fp/c83d1ac150dd50368bb2e4e756872511-cc_ft_576.jpg",
+            ...redfinPhotos("305", "1668305", 47, 0)
+          ]),
+          description: {
+            en: "Classic stone ranch on a large corner lot with an updated kitchen, granite countertops, fresh paint, laminate flooring, and a finished basement for extra living space.",
+            es: "Casa ranch de piedra en lote amplio con cocina renovada, granito, pintura fresca, piso laminado y sótano terminado para más espacio."
+          },
+          zillowUrl: "https://www.zillow.com/homedetails/5903-Jessamine-Ln-Louisville-KY-40258/73561400_zpid/"
+        },
+        {
+          id: "73587912",
+          title: "2205 Elmhurst Ave",
+          address: "2205 Elmhurst Ave",
+          city: "Louisville",
+          state: "KY",
+          zip: "40216",
+          bedrooms: 2,
+          bathrooms: 1,
+          sqft: 710,
+          rent: 1130,
+          fallbackImage: "assets/properties/2205-elmhurst.jpg",
+          photos: uniquePhotos([
+            "assets/properties/2205-elmhurst.jpg",
+            "https://photos.zillowstatic.com/fp/ad26e9d9599373ecb50288ab09db4836-cc_ft_960.jpg",
+            "https://photos.zillowstatic.com/fp/549a7ce56057a6f04592941d8fb42014-cc_ft_576.jpg"
+          ]),
+          description: {
+            en: "Renovated home on a quiet street off Rockford Lane with a private back yard, convenient location, hardwood flooring, washer and dryer, deck, and porch.",
+            es: "Casa renovada en una calle tranquila cerca de Rockford Lane, con patio privado, buena ubicación, piso de madera, lavadora y secadora, deck y porche."
+          },
+          zillowUrl: "https://www.zillow.com/homedetails/2205-Elmhurst-Ave-Louisville-KY-40216/73587912_zpid/"
+        },
+        {
+          id: "73577696",
+          title: "7903 Canna Dr",
+          address: "7903 Canna Dr",
+          city: "Louisville",
+          state: "KY",
+          zip: "40258",
+          bedrooms: 3,
+          bathrooms: 1,
+          sqft: 1750,
+          rent: 1580,
+          fallbackImage: "assets/properties/7903-canna.jpg",
+          photos: uniquePhotos([
+            "assets/properties/7903-canna.jpg",
+            "https://photos.zillowstatic.com/fp/816401ad9e6f9db23ec2430bf3b41162-cc_ft_768.webp",
+            "https://photos.zillowstatic.com/fp/a6bfc21b386f3e1144b05eb65b19daa3-cc_ft_384.webp",
+            ...redfinPhotos("543", "1680543", 32)
+          ]),
+          description: {
+            en: "Brick ranch in PRP with fenced back yard, finished basement, attached carport, two-car detached garage, stainless steel appliances, and flexible lower-level space.",
+            es: "Ranch de ladrillo en PRP con patio cercado, sótano terminado, carport, garaje separado para dos carros, electrodomésticos de acero inoxidable y espacio flexible abajo."
+          },
+          zillowUrl: "https://www.zillow.com/homedetails/7903-Canna-Dr-Louisville-KY-40258/73577696_zpid/"
+        },
+        {
+          id: "73547767",
+          title: "103 Scottsdale Blvd",
+          address: "103 Scottsdale Blvd",
+          city: "Louisville",
+          state: "KY",
+          zip: "40214",
+          bedrooms: 3,
+          bathrooms: 2,
+          sqft: 1397,
+          rent: 1590,
+          fallbackImage: "assets/properties/103-scottsdale.jpg",
+          photos: uniquePhotos([
+            "assets/properties/103-scottsdale.jpg",
+            "https://photos.zillowstatic.com/fp/5a1ca297940492b3fffdd3f8bdfbb04f-cc_ft_960.jpg",
+            "https://photos.zillowstatic.com/fp/7efaaae0c61947daad10e6bb78a67463-cc_ft_576.jpg",
+            "https://photos.zillowstatic.com/fp/ecd65593f332153097882aed0a882025-cc_ft_576.jpg",
+            "https://photos.zillowstatic.com/fp/d6ead7bb860641248f3f45fd9c0ac42f-cc_ft_576.jpg",
+            "https://photos.zillowstatic.com/fp/d1e11fc6afd416a44ae4c74816268f67-cc_ft_576.jpg",
+            ...redfinPhotos("043", "1712043", 35),
+            ...redfinPhotos("612", "1703612", 31)
+          ]),
+          description: {
+            en: "Warm, well-maintained ranch with open kitchen and great room, updated kitchen, pantry, laundry area, covered front porch, patio, privacy-fenced yard, pool, and storage shed.",
+            es: "Ranch acogedor y bien cuidado con cocina abierta, great room, cocina renovada, pantry, laundry, porche cubierto, patio, cerca privada, piscina y shed."
+          },
+          zillowUrl: "https://www.zillow.com/homedetails/103-Scottsdale-Blvd-Louisville-KY-40214/73547767_zpid/"
+        },
+        {
+          id: "73541489",
+          title: "3709 Carpenter Dr",
+          address: "3709 Carpenter Dr",
+          city: "Louisville",
+          state: "KY",
+          zip: "40229",
+          bedrooms: 3,
+          bathrooms: 1.5,
+          sqft: 1134,
+          rent: 1538,
+          fallbackImage: "assets/property-hero.png",
+          photos: uniquePhotos([
+            ...redfinPhotos("443", "1616443", 26)
+          ]),
+          description: {
+            en: "Bright ranch in Silver Heights with three bedrooms, one full bath plus a half bath, an attached garage, porch, chain-link fencing, and a spacious back yard.",
+            es: "Ranch claro en Silver Heights con tres habitaciones, un baño completo y medio baño, garaje, porche, cerca de chain link y un patio amplio."
+          },
+          zillowUrl: "https://www.zillow.com/homedetails/3709-Carpenter-Dr-Louisville-KY-40229/73541489_zpid/"
+        },
+        {
+          id: "73649367",
+          title: "9507 Polaris Dr",
+          address: "9507 Polaris Dr",
+          city: "Louisville",
+          state: "KY",
+          zip: "40229",
+          bedrooms: 3,
+          bathrooms: 1,
+          sqft: 1025,
+          rent: 1522,
+          fallbackImage: "assets/property-hero.png",
+          photos: uniquePhotos([
+            ...redfinPhotos("968", "1619968", 17)
+          ]),
+          description: {
+            en: "Silver Heights ranch with three bedrooms, first-floor living, dining room, kitchen, driveway parking, and major systems reported replaced in recent years.",
+            es: "Ranch en Silver Heights con tres habitaciones, distribución en un solo nivel, comedor, cocina, parqueo en driveway y sistemas principales reportados como reemplazados en años recientes."
+          },
+          zillowUrl: "https://www.zillow.com/homedetails/9507-Polaris-Dr-Louisville-KY-40229/73649367_zpid/"
+        }
+      ];
+
+      const properties = window.NJProperties ? window.NJProperties.load(defaultProperties) : defaultProperties;
+
+      const detailRoot = document.querySelector("#property-detail");
+      const languageButtons = document.querySelectorAll("[data-lang-choice]");
+      const storage = {
+        get(key) {
+          try {
+            return localStorage.getItem(key);
+          } catch {
+            return null;
+          }
+        },
+        set(key, value) {
+          try {
+            localStorage.setItem(key, value);
+          } catch {
+            return;
+          }
+        }
+      };
+      let currentLanguage = storage.get("nj-language") || "en";
+      let activePhotoIndex = 0;
+
+      function getProperty() {
+        const id = new URLSearchParams(window.location.search).get("id");
+        return properties.find((property) => property.id === id);
+      }
+
+      function escapeAttribute(value) {
+        return String(value).replaceAll("&", "&amp;").replaceAll('"', "&quot;");
+      }
+
+      function renderDetail() {
+        const dictionary = propertyTranslations[currentLanguage] || propertyTranslations.en;
+        const property = getProperty();
+
+        if (!property) {
+          detailRoot.innerHTML = `
+            <div class="property-empty-detail">
+              <a class="button neutral" href="rentals.html">${dictionary.backToRentals}</a>
+              <h1>${dictionary.notFoundTitle}</h1>
+              <p>${dictionary.notFoundCopy}</p>
+            </div>
+          `;
+          return;
+        }
+
+        const photos = property.photos && property.photos.length ? property.photos : [property.fallbackImage];
+        if (activePhotoIndex >= photos.length) activePhotoIndex = 0;
+        const activePhoto = escapeAttribute(photos[activePhotoIndex]);
+        const fallback = escapeAttribute(property.fallbackImage || "assets/property-hero.png");
+        const description = property.description[currentLanguage] || property.description.en;
+        const stats = `${property.bedrooms ?? 0} ${dictionary.bedroomUnit} &middot; ${property.bathrooms ?? 0} ${dictionary.bathroomUnit} &middot; ${Number(property.sqft || 0).toLocaleString()} ${dictionary.sqftUnit}`;
+        const zillowLink = property.zillowUrl
+          ? `<a class="button neutral" href="${escapeAttribute(property.zillowUrl)}" target="_blank" rel="noopener noreferrer">${dictionary.viewZillow}</a>`
+          : "";
+
+        detailRoot.innerHTML = `
+          <a class="button neutral detail-back" href="rentals.html">${dictionary.backToRentals}</a>
+          <div class="property-detail-layout">
+            <section class="property-detail-gallery" aria-label="${dictionary.photosTitle}">
+              <img class="property-detail-main-photo" src="${activePhoto}" alt="${dictionary.photoAlt} ${activePhotoIndex + 1}" onerror="this.onerror=null;this.src='${fallback}'" />
+              <div class="property-detail-thumbs">
+                ${photos
+                  .map(
+                    (photo, index) => `
+                      <button class="${index === activePhotoIndex ? "is-active" : ""}" type="button" data-photo-index="${index}" aria-label="${dictionary.photoAlt} ${index + 1}">
+                        <img src="${escapeAttribute(photo)}" alt="${dictionary.photoAlt} ${index + 1}" onerror="this.closest('button').remove()" />
+                      </button>
+                    `
+                  )
+                  .join("")}
+              </div>
+              <p>${dictionary.sourceNote}</p>
+            </section>
+            <section class="property-detail-info">
+              <p class="eyebrow">${dictionary.detailEyebrow}</p>
+              <h1>${property.title}</h1>
+              <p class="property-detail-stats">${stats}</p>
+              <h2>${dictionary.overviewTitle}</h2>
+              <p>${description}</p>
+              <div class="property-facts">
+                <h2>${dictionary.factsTitle}</h2>
+                <dl>
+                  <div><dt>${dictionary.addressLabel}</dt><dd>${property.address}</dd></div>
+                  <div><dt>${dictionary.cityStateLabel}</dt><dd>${property.city}, ${property.state} ${property.zip}</dd></div>
+                  <div><dt>${dictionary.bedroomsLabel}</dt><dd>${property.bedrooms ?? 0}</dd></div>
+                  <div><dt>${dictionary.bathroomsLabel}</dt><dd>${property.bathrooms ?? 0}</dd></div>
+                  <div><dt>${dictionary.sqftLabel}</dt><dd>${Number(property.sqft || 0).toLocaleString()}</dd></div>
+                </dl>
+              </div>
+              <div class="property-detail-actions">
+                <a class="button primary" href="mailto:njremodelingrental@gmail.com?subject=${encodeURIComponent(dictionary.askAbout + " " + property.title)}">${dictionary.askAbout}</a>
+                ${zillowLink}
+              </div>
+            </section>
+          </div>
+        `;
+
+        detailRoot.querySelectorAll("[data-photo-index]").forEach((button) => {
+          button.addEventListener("click", () => {
+            activePhotoIndex = Number(button.getAttribute("data-photo-index"));
+            renderDetail();
+          });
+        });
+      }
+
+      function applyLanguage(language) {
+        const activeLanguage = propertyTranslations[language] ? language : "en";
+        const dictionary = propertyTranslations[activeLanguage];
+        currentLanguage = activeLanguage;
+        document.documentElement.lang = activeLanguage;
+
+        document.querySelectorAll("[data-i18n]").forEach((element) => {
+          const key = element.getAttribute("data-i18n");
+          if (dictionary[key]) element.textContent = dictionary[key];
+        });
+
+        languageButtons.forEach((button) => {
+          const isActive = button.getAttribute("data-lang-choice") === activeLanguage;
+          button.classList.toggle("is-active", isActive);
+          button.setAttribute("aria-pressed", String(isActive));
+        });
+
+        storage.set("nj-language", activeLanguage);
+        renderDetail();
+      }
+
+      languageButtons.forEach((button) => {
+        button.addEventListener("click", () => applyLanguage(button.getAttribute("data-lang-choice")));
+      });
+
+      applyLanguage(currentLanguage);
+    </script>
+  </body>
+</html>
