@@ -1,2 +1,4 @@
 *.zip
 git-store/
+.codex-screens/
+.edge-profile-test/
