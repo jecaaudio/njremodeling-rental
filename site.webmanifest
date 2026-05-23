@@ -1,0 +1,14 @@
+{
+  "name": "NJ Remodeling and Rental",
+  "short_name": "NJ Rental",
+  "icons": [
+    {
+      "src": "assets/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#101713",
+  "background_color": "#f7f6f0",
+  "display": "standalone"
+}
