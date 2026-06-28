@@ -564,7 +564,7 @@ p {
   color: var(--white);
   background:
     linear-gradient(90deg, rgba(16, 23, 19, 0.86), rgba(16, 23, 19, 0.52)),
-    url("assets/property-hero.png") center / cover;
+    url("assets/property-hero.jpg") center / cover;
 }
 
 .rentals-page-hero div {
@@ -774,6 +774,10 @@ p {
   display: grid;
   gap: 28px;
   padding: clamp(24px, 5vw, 54px) clamp(18px, 6vw, 84px);
+}
+
+.admin-page[hidden] {
+  display: none;
 }
 
 .admin-hero {

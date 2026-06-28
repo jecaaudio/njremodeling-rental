@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Administrador de propiedades | NJ Remodeling and Rental</title>
     <meta name="description" content="Panel interno para administrar propiedades de NJ Remodeling and Rental." />
+    <meta name="robots" content="noindex, nofollow" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="icon" type="image/png" href="assets/favicon.png" />
     <link rel="apple-touch-icon" href="assets/favicon.png" />
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="styles.min.css" />
     <script src="properties-data.js"></script>
   </head>
   <body>
@@ -34,7 +35,26 @@
       </div>
     </header>
 
-    <main class="admin-page">
+    <section class="admin-page" id="admin-lock" aria-labelledby="admin-lock-title">
+      <form class="admin-form" id="admin-lock-form" style="max-width: 360px; margin: 4rem auto;">
+        <div class="admin-panel-heading">
+          <div>
+            <p class="eyebrow">Acceso restringido</p>
+            <h2 id="admin-lock-title">Panel de administracion</h2>
+          </div>
+        </div>
+        <label>
+          <span>Contrasena</span>
+          <input type="password" id="admin-lock-password" autocomplete="current-password" required />
+        </label>
+        <p class="form-status" id="admin-lock-status" aria-live="polite"></p>
+        <div class="admin-form-actions">
+          <button class="button primary" type="submit">Entrar</button>
+        </div>
+      </form>
+    </section>
+
+    <main class="admin-page" id="admin-content" hidden>
       <section class="admin-hero">
         <div>
           <p class="eyebrow">Panel interno</p>
@@ -171,6 +191,45 @@
     </footer>
 
     <script>
+      const ADMIN_PASSWORD_HASH = "10b8b44f7124feb0c609e408619f5bb082b248f0578a01e59b035b653f5deb40";
+      const ADMIN_UNLOCK_KEY = "nj-admin-unlocked-v1";
+      const lockSection = document.querySelector("#admin-lock");
+      const lockForm = document.querySelector("#admin-lock-form");
+      const lockPassword = document.querySelector("#admin-lock-password");
+      const lockStatus = document.querySelector("#admin-lock-status");
+      const adminContent = document.querySelector("#admin-content");
+
+      async function hashPassword(value) {
+        const bytes = new TextEncoder().encode(value);
+        const digest = await crypto.subtle.digest("SHA-256", bytes);
+        return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+      }
+
+      function unlockAdmin() {
+        lockSection.hidden = true;
+        adminContent.hidden = false;
+        initAdmin();
+      }
+
+      if (sessionStorage.getItem(ADMIN_UNLOCK_KEY) === "1") {
+        unlockAdmin();
+      } else {
+        lockForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const hash = await hashPassword(lockPassword.value);
+          if (hash === ADMIN_PASSWORD_HASH) {
+            sessionStorage.setItem(ADMIN_UNLOCK_KEY, "1");
+            unlockAdmin();
+          } else {
+            lockStatus.textContent = "Contrasena incorrecta.";
+            lockStatus.classList.add("is-error");
+            lockPassword.value = "";
+            lockPassword.focus();
+          }
+        });
+      }
+
+      function initAdmin() {
       const propertiesApi = window.NJProperties;
       const propertyList = document.querySelector("#property-list");
       const propertyCount = document.querySelector("#property-count");
@@ -222,7 +281,7 @@
           bathrooms: 1,
           sqft: 1000,
           rent: null,
-          photos: ["assets/property-hero.png"],
+          photos: ["assets/property-hero.jpg"],
           description: { en: "", es: "" },
           zillowUrl: ""
         });
@@ -263,7 +322,7 @@
           .map(
             (photo, index) => `
               <article class="admin-photo-card">
-                <img src="${escapeHtml(photo)}" alt="Foto ${index + 1}" onerror="this.closest('.admin-photo-card').classList.add('has-broken-image')" />
+                <img src="${escapeHtml(photo)}" alt="Foto ${index + 1}" loading="lazy" decoding="async" onerror="this.closest('.admin-photo-card').classList.add('has-broken-image')" />
                 <div>
                   <button class="button neutral" type="button" data-photo-action="cover" data-photo-index="${index}" ${index === 0 ? "disabled" : ""}>Principal</button>
                   <button class="button danger" type="button" data-photo-action="remove" data-photo-index="${index}">Quitar</button>
@@ -322,9 +381,9 @@
           bathrooms: formData.get("bathrooms"),
           sqft: formData.get("sqft"),
           rent: formData.get("rent"),
-          image: photos[0] || "assets/property-hero.png",
-          fallbackImage: photos[0] || "assets/property-hero.png",
-          photos: photos.length ? photos : ["assets/property-hero.png"],
+          image: photos[0] || "assets/property-hero.jpg",
+          fallbackImage: photos[0] || "assets/property-hero.jpg",
+          photos: photos.length ? photos : ["assets/property-hero.jpg"],
           description: {
             en: formData.get("descriptionEn"),
             es: formData.get("descriptionEs")
@@ -334,7 +393,7 @@
       }
 
       function addDraftPhotos(photos) {
-        const basePhotos = draftPhotos.length === 1 && draftPhotos[0] === "assets/property-hero.png" ? [] : draftPhotos;
+        const basePhotos = draftPhotos.length === 1 && draftPhotos[0] === "assets/property-hero.jpg" ? [] : draftPhotos;
         draftPhotos = propertiesApi.uniquePhotos([...basePhotos, ...photos]);
       }
 
@@ -488,6 +547,7 @@
       });
 
       render();
+      }
     </script>
   </body>
 </html>

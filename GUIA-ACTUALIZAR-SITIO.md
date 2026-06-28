@@ -4,7 +4,7 @@ Esta guia es para cambiar propiedades, textos y fotos de NJ Remodeling and Renta
 
 ## La forma mas facil ahora
 
-Abre el archivo `admin.html` en tu navegador. Desde ese panel puedes:
+Abre el archivo `admin.html` en tu navegador. Te va a pedir una contrasena antes de mostrar el panel (proteccion basica, no es seguridad de servidor real). Desde ese panel puedes:
 
 - agregar una casa nueva
 - editar direccion, ciudad, estado, habitaciones, banos y pies cuadrados
@@ -76,6 +76,6 @@ Si Zillow no deja descargar las fotos directamente, la pagina puede usar enlaces
 
 ## Importante
 
-Este panel funciona muy bien para manejar la pagina desde tu computadora, pero no tiene contrasena ni servidor. Cuando la pagina este publicada para clientes reales, lo ideal sera conectar un panel privado con usuario y contrasena para que los cambios se publiquen en internet de forma permanente.
+Este panel funciona muy bien para manejar la pagina desde tu computadora. Ahora pide una contrasena al entrar, pero como no tiene servidor, esa proteccion es basica (alguien que revise el codigo fuente podria evitarla). Cuando la pagina este publicada para clientes reales, lo ideal sera conectar un panel privado con usuario y contrasena verificados en un servidor para que los cambios se publiquen en internet de forma permanente.
 
 Por ahora, usa `admin.html` como panel local y guarda respaldos cada vez que cambies propiedades.

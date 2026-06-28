@@ -133,7 +133,7 @@
       sqft: 1134,
       rent: 1538,
       image: "https://ssl.cdn-redfin.com/photo/185/bigphoto/443/1616443_1.jpg",
-      fallbackImage: "assets/property-hero.png",
+      fallbackImage: "assets/property-hero.jpg",
       photos: uniquePhotos([...redfinPhotos("443", "1616443", 26)]),
       description: {
         en: "Bright ranch in Silver Heights with three bedrooms, one full bath plus a half bath, an attached garage, porch, chain-link fencing, and a spacious back yard.",
@@ -153,7 +153,7 @@
       sqft: 1025,
       rent: 1522,
       image: "https://ssl.cdn-redfin.com/photo/185/bigphoto/968/1619968_1.jpg",
-      fallbackImage: "assets/property-hero.png",
+      fallbackImage: "assets/property-hero.jpg",
       photos: uniquePhotos([...redfinPhotos("968", "1619968", 17)]),
       description: {
         en: "Silver Heights ranch with three bedrooms, first-floor living, dining room, kitchen, driveway parking, and major systems reported replaced in recent years.",
@@ -178,7 +178,7 @@
       ? { en: property.description, es: property.description }
       : property.description || {};
     const photos = uniquePhotos(property.photos || []);
-    const fallbackImage = property.fallbackImage || property.image || photos[0] || "assets/property-hero.png";
+    const fallbackImage = property.fallbackImage || property.image || photos[0] || "assets/property-hero.jpg";
     const image = property.image || photos[0] || fallbackImage;
 
     return {
