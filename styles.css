@@ -564,7 +564,7 @@ p {
   color: var(--white);
   background:
     linear-gradient(90deg, rgba(16, 23, 19, 0.86), rgba(16, 23, 19, 0.52)),
-    url("assets/property-hero.png") center / cover;
+    url("assets/property-hero.jpg") center / cover;
 }
 
 .rentals-page-hero div {

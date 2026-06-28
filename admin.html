@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Administrador de propiedades | NJ Remodeling and Rental</title>
     <meta name="description" content="Panel interno para administrar propiedades de NJ Remodeling and Rental." />
+    <meta name="robots" content="noindex, nofollow" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -222,7 +223,7 @@
           bathrooms: 1,
           sqft: 1000,
           rent: null,
-          photos: ["assets/property-hero.png"],
+          photos: ["assets/property-hero.jpg"],
           description: { en: "", es: "" },
           zillowUrl: ""
         });
@@ -322,9 +323,9 @@
           bathrooms: formData.get("bathrooms"),
           sqft: formData.get("sqft"),
           rent: formData.get("rent"),
-          image: photos[0] || "assets/property-hero.png",
-          fallbackImage: photos[0] || "assets/property-hero.png",
-          photos: photos.length ? photos : ["assets/property-hero.png"],
+          image: photos[0] || "assets/property-hero.jpg",
+          fallbackImage: photos[0] || "assets/property-hero.jpg",
+          photos: photos.length ? photos : ["assets/property-hero.jpg"],
           description: {
             en: formData.get("descriptionEn"),
             es: formData.get("descriptionEs")
@@ -334,7 +335,7 @@
       }
 
       function addDraftPhotos(photos) {
-        const basePhotos = draftPhotos.length === 1 && draftPhotos[0] === "assets/property-hero.png" ? [] : draftPhotos;
+        const basePhotos = draftPhotos.length === 1 && draftPhotos[0] === "assets/property-hero.jpg" ? [] : draftPhotos;
         draftPhotos = propertiesApi.uniquePhotos([...basePhotos, ...photos]);
       }
 

@@ -8,6 +8,16 @@
       name="description"
       content="View rental property photos, details, and contact options from NJ Remodeling and Rental."
     />
+    <link rel="canonical" href="https://jecaaudio.github.io/njremodeling-rental/property.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Property Details | NJ Remodeling and Rental" />
+    <meta
+      property="og:description"
+      content="View rental property photos, details, and contact options from NJ Remodeling and Rental."
+    />
+    <meta property="og:image" content="https://jecaaudio.github.io/njremodeling-rental/assets/property-hero.jpg" />
+    <meta property="og:url" content="https://jecaaudio.github.io/njremodeling-rental/property.html" />
+    <meta name="twitter:card" content="summary_large_image" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -237,7 +247,7 @@
           bathrooms: 1.5,
           sqft: 1134,
           rent: 1538,
-          fallbackImage: "assets/property-hero.png",
+          fallbackImage: "assets/property-hero.jpg",
           photos: uniquePhotos([
             ...redfinPhotos("443", "1616443", 26)
           ]),
@@ -258,7 +268,7 @@
           bathrooms: 1,
           sqft: 1025,
           rent: 1522,
-          fallbackImage: "assets/property-hero.png",
+          fallbackImage: "assets/property-hero.jpg",
           photos: uniquePhotos([
             ...redfinPhotos("968", "1619968", 17)
           ]),
@@ -320,7 +330,7 @@
         const photos = property.photos && property.photos.length ? property.photos : [property.fallbackImage];
         if (activePhotoIndex >= photos.length) activePhotoIndex = 0;
         const activePhoto = escapeAttribute(photos[activePhotoIndex]);
-        const fallback = escapeAttribute(property.fallbackImage || "assets/property-hero.png");
+        const fallback = escapeAttribute(property.fallbackImage || "assets/property-hero.jpg");
         const description = property.description[currentLanguage] || property.description.en;
         const stats = `${property.bedrooms ?? 0} ${dictionary.bedroomUnit} &middot; ${property.bathrooms ?? 0} ${dictionary.bathroomUnit} &middot; ${Number(property.sqft || 0).toLocaleString()} ${dictionary.sqftUnit}`;
         const zillowLink = property.zillowUrl

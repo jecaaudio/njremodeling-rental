@@ -8,6 +8,16 @@
       name="description"
       content="Search available rental properties from NJ Remodeling and Rental by city, state, bedrooms, and budget."
     />
+    <link rel="canonical" href="https://jecaaudio.github.io/njremodeling-rental/rentals.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Available Rentals | NJ Remodeling and Rental" />
+    <meta
+      property="og:description"
+      content="Search available rental properties from NJ Remodeling and Rental by city, state, bedrooms, and budget."
+    />
+    <meta property="og:image" content="https://jecaaudio.github.io/njremodeling-rental/assets/property-hero.jpg" />
+    <meta property="og:url" content="https://jecaaudio.github.io/njremodeling-rental/rentals.html" />
+    <meta name="twitter:card" content="summary_large_image" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -376,7 +386,7 @@
           sqft: 1134,
           rent: 1538,
           image: "https://ssl.cdn-redfin.com/photo/185/bigphoto/443/1616443_1.jpg",
-          fallbackImage: "assets/property-hero.png",
+          fallbackImage: "assets/property-hero.jpg",
           photos: uniquePhotos([
             ...redfinPhotos("443", "1616443", 26)
           ]),
@@ -398,7 +408,7 @@
           sqft: 1025,
           rent: 1522,
           image: "https://ssl.cdn-redfin.com/photo/185/bigphoto/968/1619968_1.jpg",
-          fallbackImage: "assets/property-hero.png",
+          fallbackImage: "assets/property-hero.jpg",
           photos: uniquePhotos([
             ...redfinPhotos("968", "1619968", 17)
           ]),
@@ -481,7 +491,7 @@
 
       function renderGallery(property, dictionary) {
         const photos = property.photos && property.photos.length ? property.photos : [property.image];
-        const fallback = escapeAttribute(property.fallbackImage || property.image || "assets/property-hero.png");
+        const fallback = escapeAttribute(property.fallbackImage || property.image || "assets/property-hero.jpg");
         const mainPhoto = escapeAttribute(photos[0]);
         const detailUrl = `property.html?id=${encodeURIComponent(property.id)}`;
         const thumbnails = photos
