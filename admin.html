@@ -322,7 +322,7 @@
           .map(
             (photo, index) => `
               <article class="admin-photo-card">
-                <img src="${escapeHtml(photo)}" alt="Foto ${index + 1}" onerror="this.closest('.admin-photo-card').classList.add('has-broken-image')" />
+                <img src="${escapeHtml(photo)}" alt="Foto ${index + 1}" loading="lazy" decoding="async" onerror="this.closest('.admin-photo-card').classList.add('has-broken-image')" />
                 <div>
                   <button class="button neutral" type="button" data-photo-action="cover" data-photo-index="${index}" ${index === 0 ? "disabled" : ""}>Principal</button>
                   <button class="button danger" type="button" data-photo-action="remove" data-photo-index="${index}">Quitar</button>

@@ -338,7 +338,7 @@
             const safePhoto = escapeAttribute(photo);
             return `
               <a class="property-thumb" href="${detailUrl}" aria-label="${dictionary.viewDetails}: ${property.title}">
-                <img src="${safePhoto}" alt="${dictionary.photoAlt} ${index + 2}" onerror="this.closest('.property-thumb').remove()" />
+                <img src="${safePhoto}" alt="${dictionary.photoAlt} ${index + 2}" loading="lazy" decoding="async" onerror="this.closest('.property-thumb').remove()" />
               </a>
             `;
           })
@@ -347,7 +347,7 @@
         return `
           <div class="property-gallery">
             <a class="property-gallery-main" href="${detailUrl}" aria-label="${dictionary.viewDetails}: ${property.title}">
-              <img src="${mainPhoto}" alt="${dictionary.photoAlt} 1" onerror="this.onerror=null;this.src='${fallback}'" />
+              <img src="${mainPhoto}" alt="${dictionary.photoAlt} 1" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='${fallback}'" />
             </a>
             ${thumbnails ? `<div class="property-thumbs">${thumbnails}</div>` : ""}
           </div>
@@ -392,6 +392,26 @@
 
         emptyResults.hidden = visibleRentals.length > 0;
         emptyRequestLink.href = mailtoForSearch(filters);
+        updateStructuredData(visibleRentals);
+      }
+
+      function updateStructuredData(visibleRentals) {
+        const existing = document.querySelector("#rentals-structured-data");
+        if (existing) existing.remove();
+        const script = document.createElement("script");
+        script.type = "application/ld+json";
+        script.id = "rentals-structured-data";
+        script.textContent = JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          itemListElement: visibleRentals.map((property, index) => ({
+            "@type": "ListItem",
+            position: index + 1,
+            url: `https://jecaaudio.github.io/njremodeling-rental/property.html?id=${encodeURIComponent(property.id)}`,
+            name: property.title
+          }))
+        });
+        document.head.appendChild(script);
       }
 
       function applyLanguage(language) {

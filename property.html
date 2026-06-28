@@ -164,6 +164,7 @@
               <p>${dictionary.notFoundCopy}</p>
             </div>
           `;
+          removeStructuredData();
           return;
         }
 
@@ -187,7 +188,7 @@
                   .map(
                     (photo, index) => `
                       <button class="${index === activePhotoIndex ? "is-active" : ""}" type="button" data-photo-index="${index}" aria-label="${dictionary.photoAlt} ${index + 1}">
-                        <img src="${escapeAttribute(photo)}" alt="${dictionary.photoAlt} ${index + 1}" onerror="this.closest('button').remove()" />
+                        <img src="${escapeAttribute(photo)}" alt="${dictionary.photoAlt} ${index + 1}" loading="lazy" decoding="async" onerror="this.closest('button').remove()" />
                       </button>
                     `
                   )
@@ -225,6 +226,39 @@
             renderDetail();
           });
         });
+
+        updateStructuredData(property, photos);
+      }
+
+      function removeStructuredData() {
+        const existing = document.querySelector("#property-structured-data");
+        if (existing) existing.remove();
+      }
+
+      function updateStructuredData(property, photos) {
+        removeStructuredData();
+        const script = document.createElement("script");
+        script.type = "application/ld+json";
+        script.id = "property-structured-data";
+        script.textContent = JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Residence",
+          name: property.title,
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: property.address,
+            addressLocality: property.city,
+            addressRegion: property.state,
+            postalCode: property.zip,
+            addressCountry: "US"
+          },
+          numberOfRooms: property.bedrooms ?? undefined,
+          floorSize: property.sqft
+            ? { "@type": "QuantitativeValue", value: property.sqft, unitCode: "FTK" }
+            : undefined,
+          image: photos
+        });
+        document.head.appendChild(script);
       }
 
       function applyLanguage(language) {
