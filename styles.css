@@ -776,6 +776,10 @@ p {
   padding: clamp(24px, 5vw, 54px) clamp(18px, 6vw, 84px);
 }
 
+.admin-page[hidden] {
+  display: none;
+}
+
 .admin-hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;

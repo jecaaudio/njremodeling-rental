@@ -35,7 +35,26 @@
       </div>
     </header>
 
-    <main class="admin-page">
+    <section class="admin-page" id="admin-lock" aria-labelledby="admin-lock-title">
+      <form class="admin-form" id="admin-lock-form" style="max-width: 360px; margin: 4rem auto;">
+        <div class="admin-panel-heading">
+          <div>
+            <p class="eyebrow">Acceso restringido</p>
+            <h2 id="admin-lock-title">Panel de administracion</h2>
+          </div>
+        </div>
+        <label>
+          <span>Contrasena</span>
+          <input type="password" id="admin-lock-password" autocomplete="current-password" required />
+        </label>
+        <p class="form-status" id="admin-lock-status" aria-live="polite"></p>
+        <div class="admin-form-actions">
+          <button class="button primary" type="submit">Entrar</button>
+        </div>
+      </form>
+    </section>
+
+    <main class="admin-page" id="admin-content" hidden>
       <section class="admin-hero">
         <div>
           <p class="eyebrow">Panel interno</p>
@@ -172,6 +191,45 @@
     </footer>
 
     <script>
+      const ADMIN_PASSWORD_HASH = "10b8b44f7124feb0c609e408619f5bb082b248f0578a01e59b035b653f5deb40";
+      const ADMIN_UNLOCK_KEY = "nj-admin-unlocked-v1";
+      const lockSection = document.querySelector("#admin-lock");
+      const lockForm = document.querySelector("#admin-lock-form");
+      const lockPassword = document.querySelector("#admin-lock-password");
+      const lockStatus = document.querySelector("#admin-lock-status");
+      const adminContent = document.querySelector("#admin-content");
+
+      async function hashPassword(value) {
+        const bytes = new TextEncoder().encode(value);
+        const digest = await crypto.subtle.digest("SHA-256", bytes);
+        return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+      }
+
+      function unlockAdmin() {
+        lockSection.hidden = true;
+        adminContent.hidden = false;
+        initAdmin();
+      }
+
+      if (sessionStorage.getItem(ADMIN_UNLOCK_KEY) === "1") {
+        unlockAdmin();
+      } else {
+        lockForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const hash = await hashPassword(lockPassword.value);
+          if (hash === ADMIN_PASSWORD_HASH) {
+            sessionStorage.setItem(ADMIN_UNLOCK_KEY, "1");
+            unlockAdmin();
+          } else {
+            lockStatus.textContent = "Contrasena incorrecta.";
+            lockStatus.classList.add("is-error");
+            lockPassword.value = "";
+            lockPassword.focus();
+          }
+        });
+      }
+
+      function initAdmin() {
       const propertiesApi = window.NJProperties;
       const propertyList = document.querySelector("#property-list");
       const propertyCount = document.querySelector("#property-count");
@@ -489,6 +547,7 @@
       });
 
       render();
+      }
     </script>
   </body>
 </html>
