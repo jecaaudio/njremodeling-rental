@@ -1,0 +1,477 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My Properties | NJ Remodeling and Rental</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="assets/favicon.png" />
+    <link rel="apple-touch-icon" href="assets/favicon.png" />
+    <link rel="stylesheet" href="styles.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="supabase-config.js"></script>
+    <script src="properties-remote.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="NJ Remodeling and Rental home">
+        <span class="brand-mark">
+          <img src="assets/favicon.png" alt="" />
+        </span>
+        <span>
+          <strong>NJ Remodeling and Rental</strong>
+          <small>Jansel E. Cutino &middot; Louisville, KY</small>
+        </span>
+      </a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="index.html">Home</a>
+        <a href="rentals.html">Rentals</a>
+        <a href="index.html#contact">Contact</a>
+      </nav>
+      <div class="header-actions">
+        <a class="header-cta" href="rentals.html">View rentals</a>
+      </div>
+    </header>
+
+    <main class="admin-page">
+      <section class="admin-hero">
+        <div>
+          <p class="eyebrow">My account</p>
+          <h1>Manage your properties</h1>
+          <p>Add a property below. New and edited properties stay pending until an admin approves them, then they appear on the public rentals page.</p>
+        </div>
+        <div class="admin-hero-actions dashboard-account-bar">
+          <span id="account-email"></span>
+          <button class="button neutral" type="button" id="logout-button">Sign out</button>
+        </div>
+      </section>
+
+      <section class="admin-layout">
+        <aside class="admin-sidebar">
+          <div class="admin-panel-heading">
+            <div>
+              <p class="eyebrow">Your listings</p>
+              <h2>Properties</h2>
+            </div>
+            <span id="property-count">0</span>
+          </div>
+          <div class="admin-property-list" id="property-list"></div>
+          <button class="button primary full-button" type="button" id="new-property-button">New property</button>
+        </aside>
+
+        <section class="admin-editor">
+          <form class="admin-form" id="property-form" hidden>
+            <input type="hidden" name="id" />
+
+            <div class="admin-panel-heading">
+              <div>
+                <p class="eyebrow">Details</p>
+                <h2 id="editor-title">Property</h2>
+              </div>
+              <span class="status-badge" id="editor-status-badge"></span>
+            </div>
+
+            <div class="admin-form-grid">
+              <label>
+                <span>Title</span>
+                <input type="text" name="title" placeholder="5903 Jessamine Ln" required />
+              </label>
+              <label>
+                <span>Address</span>
+                <input type="text" name="address" placeholder="5903 Jessamine Ln" required />
+              </label>
+              <label>
+                <span>City</span>
+                <input type="text" name="city" placeholder="Louisville" required />
+              </label>
+              <label>
+                <span>State</span>
+                <input type="text" name="state" maxlength="2" placeholder="KY" required />
+              </label>
+              <label>
+                <span>ZIP</span>
+                <input type="text" name="zip" placeholder="40258" />
+              </label>
+              <label>
+                <span>Bedrooms</span>
+                <input type="number" name="bedrooms" min="0" step="1" placeholder="3" required />
+              </label>
+              <label>
+                <span>Bathrooms</span>
+                <input type="number" name="bathrooms" min="0" step="0.5" placeholder="1" required />
+              </label>
+              <label>
+                <span>Square feet</span>
+                <input type="number" name="sqft" min="0" step="1" placeholder="1200" required />
+              </label>
+              <label>
+                <span>Rent (for search filter)</span>
+                <input type="number" name="rent" min="0" step="1" placeholder="Optional" />
+              </label>
+              <label>
+                <span>Zillow link</span>
+                <input type="url" name="zillowUrl" placeholder="https://www.zillow.com/..." />
+              </label>
+            </div>
+
+            <label>
+              <span>Description (English)</span>
+              <textarea name="descriptionEn" rows="4" placeholder="Describe the rental, updates, location, and useful details."></textarea>
+            </label>
+
+            <label>
+              <span>Description (Spanish)</span>
+              <textarea name="descriptionEs" rows="4" placeholder="Describe la renta, renovaciones, ubicacion y detalles utiles."></textarea>
+            </label>
+
+            <section class="admin-photo-section" aria-labelledby="photos-heading">
+              <div class="admin-panel-heading">
+                <div>
+                  <p class="eyebrow">Gallery</p>
+                  <h2 id="photos-heading">Photos</h2>
+                </div>
+                <span id="photo-count">0</span>
+              </div>
+
+              <div class="admin-photo-grid" id="photo-grid"></div>
+
+              <div class="admin-photo-tools">
+                <label class="photo-upload">
+                  <span>Upload photos</span>
+                  <input type="file" id="photo-files" accept="image/*" multiple />
+                </label>
+                <div class="admin-url-row">
+                  <input type="url" id="photo-url" placeholder="Paste a photo link" />
+                  <button class="button neutral" type="button" id="add-photo-url">Add link</button>
+                </div>
+              </div>
+            </section>
+
+            <div class="admin-form-actions">
+              <button class="button primary" type="submit">Save</button>
+              <button class="button danger" type="button" id="delete-button">Remove property</button>
+            </div>
+            <p class="form-status" id="dashboard-status" aria-live="polite"></p>
+          </form>
+        </section>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; 2026 NJ Remodeling and Rental. Louisville, KY.</p>
+      <div>
+        <a href="rentals.html">View rentals</a>
+        <a href="mailto:njremodelingrental@gmail.com">njremodelingrental@gmail.com</a>
+      </div>
+    </footer>
+
+    <script>
+      (async () => {
+        const remote = window.NJRemoteProperties;
+        const session = await remote.requireSession("login.html?redirect=dashboard.html");
+        if (!session) return;
+        initDashboard(session);
+      })();
+
+      function initDashboard(session) {
+        const remote = window.NJRemoteProperties;
+        const client = window.supabaseClient;
+        const userId = session.user.id;
+
+        document.querySelector("#account-email").textContent = session.user.email;
+        document.querySelector("#logout-button").addEventListener("click", async () => {
+          await client.auth.signOut();
+          window.location.href = "login.html";
+        });
+
+        const propertyList = document.querySelector("#property-list");
+        const propertyCount = document.querySelector("#property-count");
+        const photoCount = document.querySelector("#photo-count");
+        const photoGrid = document.querySelector("#photo-grid");
+        const form = document.querySelector("#property-form");
+        const editorTitle = document.querySelector("#editor-title");
+        const editorBadge = document.querySelector("#editor-status-badge");
+        const statusText = document.querySelector("#dashboard-status");
+        const newPropertyButton = document.querySelector("#new-property-button");
+        const deleteButton = document.querySelector("#delete-button");
+        const photoFiles = document.querySelector("#photo-files");
+        const photoUrl = document.querySelector("#photo-url");
+        const addPhotoUrl = document.querySelector("#add-photo-url");
+
+        let properties = [];
+        let selectedId = null;
+        let draftPhotos = [];
+
+        function escapeHtml(value) {
+          return String(value || "")
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;");
+        }
+
+        function setStatus(message, isError = false) {
+          statusText.textContent = message;
+          statusText.classList.toggle("is-error", isError);
+        }
+
+        function currentProperty() {
+          return properties.find((property) => property.dbId === selectedId) || null;
+        }
+
+        async function loadProperties() {
+          const { data, error } = await client
+            .from("properties")
+            .select("*")
+            .eq("owner_id", userId)
+            .order("created_at", { ascending: false });
+          if (error) {
+            setStatus("Could not load your properties.", true);
+            return;
+          }
+          properties = (data || []).map(remote.mapRow);
+          if (!selectedId && properties[0]) selectedId = properties[0].dbId;
+          render();
+        }
+
+        function renderList() {
+          propertyCount.textContent = String(properties.length);
+          propertyList.innerHTML = properties
+            .map((property) => {
+              const cover = property.photos[0] || property.fallbackImage;
+              const isActive = property.dbId === selectedId ? " is-active" : "";
+              const badge = property.approved
+                ? '<span class="status-badge is-approved">Live</span>'
+                : '<span class="status-badge is-pending">Pending</span>';
+              return `
+                <button class="admin-property-item${isActive}" type="button" data-property-id="${escapeHtml(property.dbId)}">
+                  <img src="${escapeHtml(cover)}" alt="" onerror="this.style.visibility='hidden'" />
+                  <span>
+                    <strong>${escapeHtml(property.title)}</strong>
+                    <small>${escapeHtml(property.city)}, ${escapeHtml(property.state)} ${badge}</small>
+                  </span>
+                </button>
+              `;
+            })
+            .join("");
+        }
+
+        function renderPhotos() {
+          photoCount.textContent = `${draftPhotos.length}`;
+          photoGrid.innerHTML = draftPhotos
+            .map(
+              (photo, index) => `
+                <article class="admin-photo-card">
+                  <img src="${escapeHtml(photo)}" alt="Photo ${index + 1}" loading="lazy" decoding="async" onerror="this.closest('.admin-photo-card').classList.add('has-broken-image')" />
+                  <div>
+                    <button class="button neutral" type="button" data-photo-action="cover" data-photo-index="${index}" ${index === 0 ? "disabled" : ""}>Cover</button>
+                    <button class="button danger" type="button" data-photo-action="remove" data-photo-index="${index}">Remove</button>
+                  </div>
+                </article>
+              `
+            )
+            .join("");
+        }
+
+        function fillForm(property) {
+          if (!property) {
+            form.hidden = true;
+            return;
+          }
+          form.hidden = false;
+          form.elements.id.value = property.dbId;
+          form.elements.title.value = property.title || "";
+          form.elements.address.value = property.address || "";
+          form.elements.city.value = property.city || "";
+          form.elements.state.value = property.state || "";
+          form.elements.zip.value = property.zip || "";
+          form.elements.bedrooms.value = property.bedrooms ?? "";
+          form.elements.bathrooms.value = property.bathrooms ?? "";
+          form.elements.sqft.value = property.sqft ?? "";
+          form.elements.rent.value = property.rent ?? "";
+          form.elements.zillowUrl.value = property.zillowUrl || "";
+          form.elements.descriptionEn.value = property.description.en || "";
+          form.elements.descriptionEs.value = property.description.es || "";
+          draftPhotos = [...(property.photos || [])];
+          editorTitle.textContent = property.title || "Property";
+          editorBadge.textContent = property.approved ? "Live" : "Pending review";
+          editorBadge.className = `status-badge ${property.approved ? "is-approved" : "is-pending"}`;
+          renderPhotos();
+        }
+
+        function render() {
+          renderList();
+          fillForm(currentProperty());
+        }
+
+        function buildEmptyDraft() {
+          return {
+            dbId: null,
+            title: "",
+            address: "",
+            city: "Louisville",
+            state: "KY",
+            zip: "",
+            bedrooms: 3,
+            bathrooms: 1,
+            sqft: 1000,
+            rent: null,
+            zillowUrl: "",
+            description: { en: "", es: "" },
+            photos: ["assets/property-hero.jpg"],
+            approved: false
+          };
+        }
+
+        function collectFormValues() {
+          const formData = new FormData(form);
+          return {
+            title: formData.get("title"),
+            address: formData.get("address"),
+            city: formData.get("city"),
+            state: formData.get("state"),
+            zip: formData.get("zip"),
+            bedrooms: formData.get("bedrooms"),
+            bathrooms: formData.get("bathrooms"),
+            sqft: formData.get("sqft"),
+            rent: formData.get("rent"),
+            zillowUrl: formData.get("zillowUrl"),
+            descriptionEn: formData.get("descriptionEn"),
+            descriptionEs: formData.get("descriptionEs"),
+            photos: remote.uniquePhotos(draftPhotos)
+          };
+        }
+
+        function addDraftPhotos(photos) {
+          const basePhotos = draftPhotos.length === 1 && draftPhotos[0] === "assets/property-hero.jpg" ? [] : draftPhotos;
+          draftPhotos = remote.uniquePhotos([...basePhotos, ...photos]);
+        }
+
+        function imageFileToDataUrl(file) {
+          return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onerror = () => reject(new Error("Could not read photo."));
+            reader.onload = () => {
+              const image = new Image();
+              image.onerror = () => reject(new Error("Unsupported photo format."));
+              image.onload = () => {
+                const maxSize = 1400;
+                const scale = Math.min(1, maxSize / Math.max(image.width, image.height));
+                const canvas = document.createElement("canvas");
+                canvas.width = Math.max(1, Math.round(image.width * scale));
+                canvas.height = Math.max(1, Math.round(image.height * scale));
+                const context = canvas.getContext("2d");
+                context.drawImage(image, 0, 0, canvas.width, canvas.height);
+                resolve(canvas.toDataURL("image/jpeg", 0.72));
+              };
+              image.src = reader.result;
+            };
+            reader.readAsDataURL(file);
+          });
+        }
+
+        propertyList.addEventListener("click", (event) => {
+          const button = event.target.closest("[data-property-id]");
+          if (!button) return;
+          selectedId = button.getAttribute("data-property-id");
+          setStatus("");
+          render();
+        });
+
+        newPropertyButton.addEventListener("click", () => {
+          selectedId = null;
+          setStatus("");
+          fillForm(buildEmptyDraft());
+          renderList();
+        });
+
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const values = collectFormValues();
+          const row = remote.toRow(values, userId);
+          setStatus("Saving...");
+
+          if (selectedId) {
+            row.approved = false;
+            const { error } = await client.from("properties").update(row).eq("id", selectedId);
+            if (error) {
+              setStatus("Could not save changes.", true);
+              return;
+            }
+            setStatus("Saved. Submitted for review again.");
+          } else {
+            const { data, error } = await client.from("properties").insert(row).select().single();
+            if (error) {
+              setStatus("Could not save this property.", true);
+              return;
+            }
+            selectedId = data.id;
+            setStatus("Property submitted for review.");
+          }
+          await loadProperties();
+        });
+
+        deleteButton.addEventListener("click", async () => {
+          const property = currentProperty();
+          if (!property) return;
+          const confirmed = confirm(`Remove ${property.title}?`);
+          if (!confirmed) return;
+          const { error } = await client.from("properties").delete().eq("id", property.dbId);
+          if (error) {
+            setStatus("Could not remove this property.", true);
+            return;
+          }
+          selectedId = null;
+          setStatus("Property removed.");
+          await loadProperties();
+        });
+
+        photoFiles.addEventListener("change", async () => {
+          const files = [...photoFiles.files].filter((file) => file.type.startsWith("image/"));
+          if (!files.length) return;
+          setStatus("Processing photos...");
+          try {
+            const photos = [];
+            for (const file of files) {
+              photos.push(await imageFileToDataUrl(file));
+            }
+            addDraftPhotos(photos);
+            renderPhotos();
+            setStatus("Photos added. Save to submit them.");
+          } catch {
+            setStatus("Could not add some photos.", true);
+          } finally {
+            photoFiles.value = "";
+          }
+        });
+
+        addPhotoUrl.addEventListener("click", () => {
+          const url = photoUrl.value.trim();
+          if (!url) return;
+          addDraftPhotos([url]);
+          photoUrl.value = "";
+          renderPhotos();
+          setStatus("Link added. Save to submit it.");
+        });
+
+        photoGrid.addEventListener("click", (event) => {
+          const button = event.target.closest("[data-photo-action]");
+          if (!button) return;
+          const index = Number(button.getAttribute("data-photo-index"));
+          const action = button.getAttribute("data-photo-action");
+          if (action === "remove") draftPhotos.splice(index, 1);
+          if (action === "cover" && index > 0) {
+            const [photo] = draftPhotos.splice(index, 1);
+            draftPhotos.unshift(photo);
+          }
+          renderPhotos();
+        });
+
+        loadProperties();
+      }
+    </script>
+  </body>
+</html>

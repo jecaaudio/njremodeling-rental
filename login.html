@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sign In | NJ Remodeling and Rental</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="assets/favicon.png" />
+    <link rel="apple-touch-icon" href="assets/favicon.png" />
+    <link rel="stylesheet" href="styles.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="supabase-config.js"></script>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="NJ Remodeling and Rental home">
+        <span class="brand-mark">
+          <img src="assets/favicon.png" alt="" />
+        </span>
+        <span>
+          <strong>NJ Remodeling and Rental</strong>
+          <small>Jansel E. Cutino &middot; Louisville, KY</small>
+        </span>
+      </a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="index.html" data-i18n="navHome">Home</a>
+        <a href="rentals.html" data-i18n="navRentals">Rentals</a>
+        <a href="index.html#contact" data-i18n="navContact">Contact</a>
+      </nav>
+      <div class="header-actions">
+        <div class="language-switch" aria-label="Language selector">
+          <button type="button" class="language-option is-active" data-lang-choice="en">EN</button>
+          <button type="button" class="language-option" data-lang-choice="es">ES</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="admin-page">
+      <section class="admin-hero">
+        <div>
+          <p class="eyebrow" data-i18n="eyebrow">Owner and renter accounts</p>
+          <h1 data-i18n="title">Sign in to post properties.</h1>
+          <p data-i18n="copy">Create an account to submit rental listings. New listings are reviewed before they appear on the public site.</p>
+        </div>
+      </section>
+
+      <section class="admin-layout" style="grid-template-columns: minmax(0, 1fr);">
+        <section class="admin-editor" style="max-width: 460px; margin: 0 auto; width: 100%;">
+          <form class="admin-form" id="auth-form">
+            <div class="admin-panel-heading">
+              <div>
+                <p class="eyebrow" id="form-mode-label" data-i18n="signInLabel">Sign in</p>
+                <h2 data-i18n="formTitle">Your account</h2>
+              </div>
+            </div>
+
+            <label>
+              <span data-i18n="emailLabel">Email</span>
+              <input type="email" name="email" autocomplete="email" required />
+            </label>
+            <label>
+              <span data-i18n="passwordLabel">Password</span>
+              <input type="password" name="password" autocomplete="current-password" minlength="6" required />
+            </label>
+
+            <p class="form-status" id="auth-status" aria-live="polite"></p>
+
+            <div class="admin-form-actions">
+              <button class="button primary" type="submit" id="auth-submit" data-i18n="signInButton">Sign in</button>
+              <button class="button neutral" type="button" id="toggle-mode" data-i18n="needAccount">Need an account? Sign up</button>
+            </div>
+          </form>
+        </section>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>&copy; 2026 NJ Remodeling and Rental. Louisville, KY.</p>
+      <div>
+        <a href="tel:+15025540333">502-554-0333</a>
+        <a href="mailto:njremodelingrental@gmail.com">njremodelingrental@gmail.com</a>
+      </div>
+    </footer>
+
+    <script>
+      const loginTranslations = {
+        en: {
+          navHome: "Home",
+          navRentals: "Rentals",
+          navContact: "Contact",
+          eyebrow: "Owner and renter accounts",
+          title: "Sign in to post properties.",
+          copy: "Create an account to submit rental listings. New listings are reviewed before they appear on the public site.",
+          formTitle: "Your account",
+          emailLabel: "Email",
+          passwordLabel: "Password",
+          signInLabel: "Sign in",
+          signUpLabel: "Create account",
+          signInButton: "Sign in",
+          signUpButton: "Create account",
+          needAccount: "Need an account? Sign up",
+          haveAccount: "Already have an account? Sign in",
+          working: "Working...",
+          signedIn: "Signed in. Redirecting...",
+          checkEmail: "Account created. Check your email to confirm, then sign in.",
+          genericError: "Something went wrong. Check your email and password."
+        },
+        es: {
+          navHome: "Inicio",
+          navRentals: "Rentas",
+          navContact: "Contacto",
+          eyebrow: "Cuentas de propietarios e inquilinos",
+          title: "Inicia sesion para publicar propiedades.",
+          copy: "Crea una cuenta para enviar propiedades en renta. Las propiedades nuevas se revisan antes de verse en el sitio publico.",
+          formTitle: "Tu cuenta",
+          emailLabel: "Correo",
+          passwordLabel: "Contrasena",
+          signInLabel: "Iniciar sesion",
+          signUpLabel: "Crear cuenta",
+          signInButton: "Iniciar sesion",
+          signUpButton: "Crear cuenta",
+          needAccount: "No tienes cuenta? Crear una",
+          haveAccount: "Ya tienes cuenta? Iniciar sesion",
+          working: "Procesando...",
+          signedIn: "Sesion iniciada. Redirigiendo...",
+          checkEmail: "Cuenta creada. Revisa tu correo para confirmar y luego inicia sesion.",
+          genericError: "Algo salio mal. Revisa tu correo y contrasena."
+        }
+      };
+
+      const storage = {
+        get(key) {
+          try {
+            return localStorage.getItem(key);
+          } catch {
+            return null;
+          }
+        },
+        set(key, value) {
+          try {
+            localStorage.setItem(key, value);
+          } catch {
+            return;
+          }
+        }
+      };
+
+      let currentLanguage = storage.get("nj-language") || "en";
+      let mode = "signin";
+      const languageButtons = document.querySelectorAll("[data-lang-choice]");
+      const form = document.querySelector("#auth-form");
+      const statusText = document.querySelector("#auth-status");
+      const submitButton = document.querySelector("#auth-submit");
+      const toggleButton = document.querySelector("#toggle-mode");
+      const formModeLabel = document.querySelector("#form-mode-label");
+
+      function dictionary() {
+        return loginTranslations[currentLanguage] || loginTranslations.en;
+      }
+
+      function setStatus(message, isError = false) {
+        statusText.textContent = message;
+        statusText.classList.toggle("is-error", isError);
+      }
+
+      function applyMode() {
+        const dict = dictionary();
+        formModeLabel.textContent = mode === "signin" ? dict.signInLabel : dict.signUpLabel;
+        submitButton.textContent = mode === "signin" ? dict.signInButton : dict.signUpButton;
+        toggleButton.textContent = mode === "signin" ? dict.needAccount : dict.haveAccount;
+      }
+
+      function applyLanguage(language) {
+        const activeLanguage = loginTranslations[language] ? language : "en";
+        currentLanguage = activeLanguage;
+        document.documentElement.lang = activeLanguage;
+        const dict = dictionary();
+
+        document.querySelectorAll("[data-i18n]").forEach((element) => {
+          const key = element.getAttribute("data-i18n");
+          if (dict[key]) element.textContent = dict[key];
+        });
+
+        languageButtons.forEach((button) => {
+          const isActive = button.getAttribute("data-lang-choice") === activeLanguage;
+          button.classList.toggle("is-active", isActive);
+          button.setAttribute("aria-pressed", String(isActive));
+        });
+
+        storage.set("nj-language", activeLanguage);
+        applyMode();
+      }
+
+      toggleButton.addEventListener("click", () => {
+        mode = mode === "signin" ? "signup" : "signin";
+        setStatus("");
+        applyMode();
+      });
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const dict = dictionary();
+        if (!window.supabaseClient) {
+          setStatus(dict.genericError, true);
+          return;
+        }
+        const email = form.elements.email.value.trim();
+        const password = form.elements.password.value;
+        setStatus(dict.working);
+        submitButton.disabled = true;
+
+        try {
+          if (mode === "signup") {
+            const { error } = await window.supabaseClient.auth.signUp({ email, password });
+            if (error) throw error;
+            setStatus(dict.checkEmail);
+            mode = "signin";
+            applyMode();
+          } else {
+            const { error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+            setStatus(dict.signedIn);
+            const params = new URLSearchParams(window.location.search);
+            window.location.href = params.get("redirect") || "dashboard.html";
+          }
+        } catch (error) {
+          setStatus(error && error.message ? error.message : dict.genericError, true);
+        } finally {
+          submitButton.disabled = false;
+        }
+      });
+
+      languageButtons.forEach((button) => {
+        button.addEventListener("click", () => applyLanguage(button.getAttribute("data-lang-choice")));
+      });
+
+      applyLanguage(currentLanguage);
+
+      (async () => {
+        if (!window.supabaseClient) return;
+        const { data } = await window.supabaseClient.auth.getSession();
+        if (data && data.session) {
+          window.location.href = "dashboard.html";
+        }
+      })();
+    </script>
+  </body>
+</html>
