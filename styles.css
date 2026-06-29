@@ -922,6 +922,10 @@ p {
   padding: 24px;
 }
 
+.admin-form[hidden] {
+  display: none;
+}
+
 .admin-form-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1001,6 +1005,76 @@ p {
 
 .form-status.is-error {
   color: #9f3d30;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border: 1px solid var(--line);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.status-badge.is-pending {
+  color: #9f6b00;
+  border-color: #e8c267;
+  background: #fff8e6;
+}
+
+.status-badge.is-approved {
+  color: var(--green-dark);
+  border-color: var(--green);
+  background: #eef6ee;
+}
+
+.dashboard-account-bar {
+  align-items: center;
+}
+
+.dashboard-account-bar #account-email {
+  font-weight: 700;
+  color: var(--muted);
+}
+
+.admin-pending-section {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--white);
+  box-shadow: 0 14px 34px rgba(21, 32, 27, 0.08);
+}
+
+.admin-pending-list {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-pending-item {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid var(--line);
+  background: #fbfaf6;
+}
+
+.admin-pending-item img {
+  width: 72px;
+  height: 56px;
+  object-fit: cover;
+  background: var(--paper);
+}
+
+.admin-pending-item-actions {
+  display: flex;
+  gap: 8px;
 }
 
 .contact-direct {

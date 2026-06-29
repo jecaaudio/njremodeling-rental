@@ -13,6 +13,9 @@
     <link rel="apple-touch-icon" href="assets/favicon.png" />
     <link rel="stylesheet" href="styles.min.css" />
     <script src="properties-data.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="supabase-config.js"></script>
+    <script src="properties-remote.js"></script>
   </head>
   <body>
     <header class="site-header">
@@ -71,11 +74,23 @@
         </div>
       </section>
 
+      <section class="admin-pending-section" id="pending-section">
+        <div class="admin-panel-heading">
+          <div>
+            <p class="eyebrow">Cuentas de usuarios</p>
+            <h2>Solicitudes pendientes</h2>
+          </div>
+          <button class="button neutral" type="button" id="migrate-button">Migrar propiedades originales</button>
+        </div>
+        <p class="form-status" id="pending-status" aria-live="polite">Verificando sesion de administrador...</p>
+        <div class="admin-pending-list" id="pending-list"></div>
+      </section>
+
       <section class="admin-layout">
         <aside class="admin-sidebar">
           <div class="admin-panel-heading">
             <div>
-              <p class="eyebrow">Inventario</p>
+              <p class="eyebrow">Inventario local (legado)</p>
               <h2>Casas</h2>
             </div>
             <span id="property-count">0</span>
@@ -209,6 +224,7 @@
         lockSection.hidden = true;
         adminContent.hidden = false;
         initAdmin();
+        initPendingApprovals();
       }
 
       if (sessionStorage.getItem(ADMIN_UNLOCK_KEY) === "1") {
@@ -547,6 +563,149 @@
       });
 
       render();
+      }
+
+      async function initPendingApprovals() {
+        const remote = window.NJRemoteProperties;
+        const client = window.supabaseClient;
+        const pendingStatus = document.querySelector("#pending-status");
+        const pendingList = document.querySelector("#pending-list");
+        const migrateButton = document.querySelector("#migrate-button");
+
+        function escapeHtml(value) {
+          return String(value || "")
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&gt;")
+            .replaceAll('"', "&quot;");
+        }
+
+        if (!client) {
+          pendingStatus.textContent = "Supabase no esta configurado.";
+          pendingStatus.classList.add("is-error");
+          migrateButton.hidden = true;
+          return;
+        }
+
+        const { data: sessionData } = await client.auth.getSession();
+        const session = sessionData && sessionData.session;
+        if (!session) {
+          pendingStatus.innerHTML = 'Inicia sesion como administrador en <a href="login.html?redirect=admin.html">login.html</a> para ver y aprobar solicitudes.';
+          pendingList.innerHTML = "";
+          migrateButton.hidden = true;
+          return;
+        }
+
+        const profile = await remote.getProfile(session.user.id);
+        if (!profile || !profile.is_admin) {
+          pendingStatus.textContent = `La cuenta ${session.user.email} no tiene permisos de administrador.`;
+          pendingStatus.classList.add("is-error");
+          pendingList.innerHTML = "";
+          migrateButton.hidden = true;
+          return;
+        }
+
+        migrateButton.hidden = false;
+
+        async function loadPending() {
+          pendingStatus.textContent = "Cargando solicitudes...";
+          pendingStatus.classList.remove("is-error");
+          const { data, error } = await client
+            .from("properties")
+            .select("*")
+            .eq("approved", false)
+            .order("created_at", { ascending: false });
+          if (error) {
+            pendingStatus.textContent = "No se pudieron cargar las solicitudes.";
+            pendingStatus.classList.add("is-error");
+            return;
+          }
+          const pending = (data || []).map(remote.mapRow);
+          pendingStatus.textContent = pending.length ? `${pending.length} solicitud(es) pendiente(s).` : "No hay solicitudes pendientes.";
+          pendingList.innerHTML = pending
+            .map((property) => {
+              const cover = property.photos[0] || property.fallbackImage;
+              return `
+                <article class="admin-pending-item">
+                  <img src="${escapeHtml(cover)}" alt="" onerror="this.style.visibility='hidden'" />
+                  <span>
+                    <strong>${escapeHtml(property.title)}</strong>
+                    <small>${escapeHtml(property.city)}, ${escapeHtml(property.state)} ${escapeHtml(property.zip)}</small>
+                  </span>
+                  <div class="admin-pending-item-actions">
+                    <button class="button primary" type="button" data-approve="${escapeHtml(property.dbId)}">Aprobar</button>
+                    <button class="button danger" type="button" data-reject="${escapeHtml(property.dbId)}">Rechazar</button>
+                  </div>
+                </article>
+              `;
+            })
+            .join("");
+        }
+
+        pendingList.addEventListener("click", async (event) => {
+          const approveButton = event.target.closest("[data-approve]");
+          const rejectButton = event.target.closest("[data-reject]");
+          if (approveButton) {
+            const id = approveButton.getAttribute("data-approve");
+            await client.from("properties").update({ approved: true }).eq("id", id);
+            await loadPending();
+          }
+          if (rejectButton) {
+            const id = rejectButton.getAttribute("data-reject");
+            const confirmed = confirm("Rechazar y borrar esta solicitud?");
+            if (!confirmed) return;
+            await client.from("properties").delete().eq("id", id);
+            await loadPending();
+          }
+        });
+
+        migrateButton.addEventListener("click", async () => {
+          migrateButton.disabled = true;
+          pendingStatus.textContent = "Migrando propiedades originales...";
+          try {
+            const { data: existing } = await client.from("properties").select("legacy_id");
+            const existingIds = new Set((existing || []).map((row) => row.legacy_id).filter(Boolean));
+            const toInsert = window.NJProperties.defaultProperties
+              .filter((property) => !existingIds.has(property.id))
+              .map((property) => ({
+                ...remote.toRow(
+                  {
+                    title: property.title,
+                    address: property.address,
+                    city: property.city,
+                    state: property.state,
+                    zip: property.zip,
+                    bedrooms: property.bedrooms,
+                    bathrooms: property.bathrooms,
+                    sqft: property.sqft,
+                    rent: property.rent,
+                    zillowUrl: property.zillowUrl,
+                    descriptionEn: property.description.en,
+                    descriptionEs: property.description.es,
+                    photos: property.photos
+                  },
+                  session.user.id
+                ),
+                legacy_id: property.id,
+                approved: true
+              }));
+            if (!toInsert.length) {
+              pendingStatus.textContent = "Las propiedades originales ya estaban migradas.";
+            } else {
+              const { error } = await client.from("properties").insert(toInsert);
+              if (error) throw error;
+              pendingStatus.textContent = `${toInsert.length} propiedad(es) migrada(s) a Supabase.`;
+            }
+          } catch (error) {
+            pendingStatus.textContent = "No se pudo migrar: " + (error && error.message ? error.message : "error desconocido.");
+            pendingStatus.classList.add("is-error");
+          } finally {
+            migrateButton.disabled = false;
+            await loadPending();
+          }
+        });
+
+        await loadPending();
       }
     </script>
   </body>

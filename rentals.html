@@ -25,6 +25,9 @@
     <link rel="apple-touch-icon" href="assets/favicon.png" />
     <link rel="stylesheet" href="styles.min.css" />
     <script src="properties-data.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="supabase-config.js"></script>
+    <script src="properties-remote.js"></script>
   </head>
   <body>
     <header class="site-header">
@@ -42,6 +45,7 @@
         <a href="rentals.html" data-i18n="navRentals">Rentals</a>
         <a href="index.html#services" data-i18n="navServices">Services</a>
         <a href="index.html#contact" data-i18n="navContact">Contact</a>
+        <a href="dashboard.html" data-i18n="navPost">Post a property</a>
       </nav>
       <div class="header-actions">
         <div class="language-switch" aria-label="Language selector">
@@ -181,6 +185,7 @@
           navRentals: "Rentals",
           navServices: "Services",
           navContact: "Contact",
+          navPost: "Post a property",
           pageEyebrow: "Rental search",
           pageTitle: "Find available rentals.",
           pageCopy: "Choose a city, state, bedrooms, and budget to see properties that match your search.",
@@ -221,6 +226,7 @@
           navRentals: "Rentas",
           navServices: "Servicios",
           navContact: "Contacto",
+          navPost: "Publicar propiedad",
           pageEyebrow: "Búsqueda de renta",
           pageTitle: "Encuentra rentas disponibles.",
           pageCopy: "Escoge ciudad, estado, habitaciones y presupuesto para ver propiedades que coincidan con tu búsqueda.",
@@ -258,7 +264,7 @@
         }
       };
 
-      const rentals = window.NJProperties.load(window.NJProperties.defaultProperties);
+      let rentals = window.NJProperties.load(window.NJProperties.defaultProperties);
 
       const filterForm = document.querySelector("#rentals-filter-form");
       const resultsGrid = document.querySelector("#rentals-results-grid");
@@ -470,8 +476,19 @@
         button.addEventListener("click", () => applyLanguage(button.getAttribute("data-lang-choice")));
       });
 
+      async function refreshFromSupabase() {
+        const remote = window.NJRemoteProperties;
+        if (!remote) return;
+        const approved = await remote.fetchApprovedProperties();
+        if (approved && approved.length) {
+          rentals = approved;
+          renderRentals();
+        }
+      }
+
       loadFiltersFromUrl();
       applyLanguage(currentLanguage);
+      refreshFromSupabase();
     </script>
   </body>
 </html>

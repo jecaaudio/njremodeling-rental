@@ -2,25 +2,44 @@
 
 Esta guia es para cambiar propiedades, textos y fotos de NJ Remodeling and Rental sin tener que tocar codigo directamente.
 
-## La forma mas facil ahora
+## Nuevo: cuentas de usuario y propiedades compartidas
 
-Abre el archivo `admin.html` en tu navegador. Te va a pedir una contrasena antes de mostrar el panel (proteccion basica, no es seguridad de servidor real). Desde ese panel puedes:
+Ahora el sitio usa una base de datos en la nube (Supabase) para que **cualquier persona pueda crear una cuenta y publicar una propiedad**, y tu (el administrador) apruebas cada propiedad antes de que se vea en `rentals.html`.
 
-- agregar una casa nueva
-- editar direccion, ciudad, estado, habitaciones, banos y pies cuadrados
-- subir fotos desde tu computadora
-- pegar enlaces de fotos de Zillow, Redfin u otra fuente publica
-- escoger la foto principal
-- quitar casas
-- exportar o importar un respaldo
+### Como publica una propiedad un usuario nuevo
 
-Cuando guardas, los cambios se ven en `rentals.html` y `property.html` en ese mismo navegador.
+1. Entra a `login.html` y crea una cuenta con su correo y una contrasena.
+2. Si Supabase pide confirmar el correo, el usuario revisa su bandeja de entrada y confirma.
+3. Inicia sesion y lo manda automaticamente a `dashboard.html`.
+4. En `dashboard.html` presiona **New property**, llena los datos, sube o pega fotos, y guarda.
+5. La propiedad queda marcada como **Pending** hasta que tu la apruebes. No se ve todavia en el sitio publico.
+
+### Como apruebas tu las propiedades nuevas (administrador)
+
+1. Inicia sesion como administrador en `login.html` con el correo `njremodelingrental@gmail.com`.
+2. Abre `admin.html` (te pedira la contrasena del panel, igual que antes).
+3. En la seccion **Solicitudes pendientes** vas a ver cada propiedad nueva o editada por un usuario, con botones **Aprobar** y **Rechazar**.
+4. Al aprobar, la propiedad aparece de inmediato en `rentals.html` y `property.html` para todos los visitantes.
+5. Al rechazar, la propiedad se borra.
+
+### Configuracion de Supabase (ya hecha una vez)
+
+Si alguna vez necesitas recrear esto desde cero (por ejemplo, un proyecto de Supabase nuevo):
+
+1. Crea el proyecto en https://supabase.com y copia su **Project URL** y **Publishable key** dentro de `supabase-config.js`.
+2. Abre el **SQL Editor** del proyecto y corre el archivo `supabase/schema.sql` (crea las tablas y las reglas de seguridad).
+3. Despues de que la cuenta `njremodelingrental@gmail.com` se registre una vez en `login.html`, corre `supabase/promote-admin.sql` para volverla administrador.
+4. Inicia sesion como esa cuenta en `admin.html` y presiona **Migrar propiedades originales** para copiar las casas que ya estaban en el sitio a la base de datos nueva, ya aprobadas.
+
+## El panel local antiguo (admin.html, seccion "Inventario local")
+
+`admin.html` todavia tiene el panel viejo que guarda cambios solo en el navegador de tu computadora (no se comparte con otros visitantes). Sirve para pruebas rapidas, pero **ya no es la forma principal de publicar propiedades**. Usa el flujo de cuentas de arriba para que los cambios se vean en internet para todos.
+
+Cuando entras a `admin.html` te va a pedir una contrasena antes de mostrar el panel (proteccion basica, no es seguridad de servidor real).
 
 ## Respaldos
 
-Despues de hacer cambios importantes, presiona **Exportar respaldo**. Eso descarga un archivo llamado `nj-propiedades-respaldo.json`.
-
-Si cambias de computadora o navegador, abre `admin.html`, presiona **Importar respaldo** y selecciona ese archivo.
+Despues de hacer cambios importantes en el panel local antiguo, presiona **Exportar respaldo**. Eso descarga un archivo llamado `nj-propiedades-respaldo.json`.
 
 ## Tambien puedes pedirme ayuda
 
@@ -55,16 +74,14 @@ Copia y llena esta lista para cada casa:
 
 ## Como quitar una propiedad
 
-Solo dime la direccion y si quieres quitarla de:
+Si la publico un usuario, entra a `dashboard.html` con su cuenta (o pidele que lo haga) y presiona **Remove property**. Si tu eres administrador, tambien puedes borrarla desde la lista de pendientes o aprobadas en Supabase.
+
+Para el panel local antiguo, solo dime la direccion y si quieres quitarla de:
 
 - la pagina principal
 - la pagina de rentas
 - la pagina de detalles
 - todas las paginas
-
-Ejemplo:
-
-> Quita 103 Scottsdale Blvd de todas las paginas.
 
 ## Como agregar fotos
 
@@ -76,6 +93,4 @@ Si Zillow no deja descargar las fotos directamente, la pagina puede usar enlaces
 
 ## Importante
 
-Este panel funciona muy bien para manejar la pagina desde tu computadora. Ahora pide una contrasena al entrar, pero como no tiene servidor, esa proteccion es basica (alguien que revise el codigo fuente podria evitarla). Cuando la pagina este publicada para clientes reales, lo ideal sera conectar un panel privado con usuario y contrasena verificados en un servidor para que los cambios se publiquen en internet de forma permanente.
-
-Por ahora, usa `admin.html` como panel local y guarda respaldos cada vez que cambies propiedades.
+El panel local antiguo (`admin.html`, seccion "Inventario local") solo guarda cambios en tu navegador y no los comparte con otros visitantes. La forma correcta de publicar para todos ahora es: el usuario crea su propiedad en `dashboard.html`, y tu la apruebas en `admin.html`. La contrasena de `admin.html` sigue siendo una proteccion basica, no seguridad de servidor real; la seguridad real de quien puede editar que propiedad la maneja Supabase con las reglas de la base de datos.
