@@ -56,7 +56,8 @@
       photos: uniquePhotos([
         "https://photos.zillowstatic.com/fp/ad26e9d9599373ecb50288ab09db4836-cc_ft_960.jpg",
         "https://photos.zillowstatic.com/fp/549a7ce56057a6f04592941d8fb42014-cc_ft_960.jpg",
-        "assets/properties/2205-elmhurst.jpg"
+        "assets/properties/2205-elmhurst.jpg",
+        ...redfinPhotos("977", "1531977", 5, 0)
       ]),
       description: {
         en: "Renovated home on a quiet street off Rockford Lane with a private back yard, convenient location, hardwood flooring, washer and dryer, deck, and porch.",
@@ -131,7 +132,7 @@
       rent: 1538,
       image: "https://ssl.cdn-redfin.com/photo/185/bigphoto/443/1616443_1.jpg",
       fallbackImage: "assets/property-hero.jpg",
-      photos: uniquePhotos([...redfinPhotos("443", "1616443", 12)]),
+      photos: uniquePhotos([...redfinPhotos("443", "1616443", 13, 0)]),
       description: {
         en: "Bright ranch in Silver Heights with three bedrooms, one full bath plus a half bath, an attached garage, porch, chain-link fencing, and a spacious back yard.",
         es: "Ranch claro en Silver Heights con tres habitaciones, un bano completo y medio bano, garaje, porche, cerca de chain link y un patio amplio."
@@ -151,7 +152,7 @@
       rent: 1522,
       image: "https://ssl.cdn-redfin.com/photo/185/bigphoto/968/1619968_1.jpg",
       fallbackImage: "assets/property-hero.jpg",
-      photos: uniquePhotos([...redfinPhotos("968", "1619968", 12)]),
+      photos: uniquePhotos([...redfinPhotos("968", "1619968", 13, 0)]),
       description: {
         en: "Silver Heights ranch with three bedrooms, first-floor living, dining room, kitchen, driveway parking, and major systems reported replaced in recent years.",
         es: "Ranch en Silver Heights con tres habitaciones, distribucion en un solo nivel, comedor, cocina, parqueo en driveway y sistemas principales reportados como reemplazados en anos recientes."
