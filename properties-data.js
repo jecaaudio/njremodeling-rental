@@ -29,12 +29,12 @@
       image: "assets/properties/5903-jessamine.jpg",
       fallbackImage: "assets/properties/5903-jessamine.jpg",
       photos: uniquePhotos([
-        "assets/properties/5903-jessamine.jpg",
         "https://photos.zillowstatic.com/fp/855b690522816a1e1e962a1f346f2f75-cc_ft_960.jpg",
-        "https://photos.zillowstatic.com/fp/4b21a3846a53b37f9833c802baf3a290-cc_ft_576.jpg",
-        "https://photos.zillowstatic.com/fp/8efb555d4858c9800bec57f6a960f223-cc_ft_576.jpg",
-        "https://photos.zillowstatic.com/fp/a3fecb54eb5cb7a99a0a347dd485da06-cc_ft_576.jpg",
-        "https://photos.zillowstatic.com/fp/c83d1ac150dd50368bb2e4e756872511-cc_ft_576.jpg",
+        "https://photos.zillowstatic.com/fp/4b21a3846a53b37f9833c802baf3a290-cc_ft_960.jpg",
+        "https://photos.zillowstatic.com/fp/8efb555d4858c9800bec57f6a960f223-cc_ft_960.jpg",
+        "https://photos.zillowstatic.com/fp/a3fecb54eb5cb7a99a0a347dd485da06-cc_ft_960.jpg",
+        "https://photos.zillowstatic.com/fp/c83d1ac150dd50368bb2e4e756872511-cc_ft_960.jpg",
+        "assets/properties/5903-jessamine.jpg",
         ...redfinPhotos("305", "1668305", 47, 0)
       ]),
       description: {
@@ -57,9 +57,9 @@
       image: "assets/properties/2205-elmhurst.jpg",
       fallbackImage: "assets/properties/2205-elmhurst.jpg",
       photos: uniquePhotos([
-        "assets/properties/2205-elmhurst.jpg",
         "https://photos.zillowstatic.com/fp/ad26e9d9599373ecb50288ab09db4836-cc_ft_960.jpg",
-        "https://photos.zillowstatic.com/fp/549a7ce56057a6f04592941d8fb42014-cc_ft_576.jpg"
+        "https://photos.zillowstatic.com/fp/549a7ce56057a6f04592941d8fb42014-cc_ft_960.jpg",
+        "assets/properties/2205-elmhurst.jpg"
       ]),
       description: {
         en: "Renovated home on a quiet street off Rockford Lane with a private back yard, convenient location, hardwood flooring, washer and dryer, deck, and porch.",
@@ -81,9 +81,9 @@
       image: "assets/properties/7903-canna.jpg",
       fallbackImage: "assets/properties/7903-canna.jpg",
       photos: uniquePhotos([
+        "https://photos.zillowstatic.com/fp/816401ad9e6f9db23ec2430bf3b41162-cc_ft_960.jpg",
+        "https://photos.zillowstatic.com/fp/a6bfc21b386f3e1144b05eb65b19daa3-cc_ft_960.jpg",
         "assets/properties/7903-canna.jpg",
-        "https://photos.zillowstatic.com/fp/816401ad9e6f9db23ec2430bf3b41162-cc_ft_768.webp",
-        "https://photos.zillowstatic.com/fp/a6bfc21b386f3e1144b05eb65b19daa3-cc_ft_384.webp",
         ...redfinPhotos("543", "1680543", 32)
       ]),
       description: {
@@ -106,12 +106,12 @@
       image: "assets/properties/103-scottsdale.jpg",
       fallbackImage: "assets/properties/103-scottsdale.jpg",
       photos: uniquePhotos([
-        "assets/properties/103-scottsdale.jpg",
         "https://photos.zillowstatic.com/fp/5a1ca297940492b3fffdd3f8bdfbb04f-cc_ft_960.jpg",
-        "https://photos.zillowstatic.com/fp/7efaaae0c61947daad10e6bb78a67463-cc_ft_576.jpg",
-        "https://photos.zillowstatic.com/fp/ecd65593f332153097882aed0a882025-cc_ft_576.jpg",
-        "https://photos.zillowstatic.com/fp/d6ead7bb860641248f3f45fd9c0ac42f-cc_ft_576.jpg",
-        "https://photos.zillowstatic.com/fp/d1e11fc6afd416a44ae4c74816268f67-cc_ft_576.jpg",
+        "https://photos.zillowstatic.com/fp/7efaaae0c61947daad10e6bb78a67463-cc_ft_960.jpg",
+        "https://photos.zillowstatic.com/fp/ecd65593f332153097882aed0a882025-cc_ft_960.jpg",
+        "https://photos.zillowstatic.com/fp/d6ead7bb860641248f3f45fd9c0ac42f-cc_ft_960.jpg",
+        "https://photos.zillowstatic.com/fp/d1e11fc6afd416a44ae4c74816268f67-cc_ft_960.jpg",
+        "assets/properties/103-scottsdale.jpg",
         ...redfinPhotos("043", "1712043", 35),
         ...redfinPhotos("612", "1703612", 31)
       ]),
