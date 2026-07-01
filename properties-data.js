@@ -2,11 +2,8 @@
   const STORAGE_KEY = "nj-managed-properties-v1";
 
   function redfinPhotos(folder, mls, total, start = 1) {
-    return Array.from({ length: total }, (_, index) => index + start).flatMap((photoNumber, index) => {
-      const base = `https://ssl.cdn-redfin.com/photo/185/bigphoto/${folder}/${mls}`;
-      const urls = [`${base}_${photoNumber}.jpg`];
-      if (index > 0) urls.push(`${base}_${start}_${photoNumber}.jpg`);
-      return urls;
+    return Array.from({ length: total }, (_, index) => index + start).map((photoNumber) => {
+      return `https://ssl.cdn-redfin.com/photo/185/bigphoto/${folder}/${mls}_${photoNumber}.jpg`;
     });
   }
 
@@ -35,7 +32,7 @@
         "https://photos.zillowstatic.com/fp/a3fecb54eb5cb7a99a0a347dd485da06-cc_ft_960.jpg",
         "https://photos.zillowstatic.com/fp/c83d1ac150dd50368bb2e4e756872511-cc_ft_960.jpg",
         "assets/properties/5903-jessamine.jpg",
-        ...redfinPhotos("305", "1668305", 47, 0)
+        ...redfinPhotos("305", "1668305", 12, 0)
       ]),
       description: {
         en: "Classic stone ranch on a large corner lot with an updated kitchen, granite countertops, fresh paint, laminate flooring, and a finished basement for extra living space.",
@@ -84,7 +81,7 @@
         "https://photos.zillowstatic.com/fp/816401ad9e6f9db23ec2430bf3b41162-cc_ft_960.jpg",
         "https://photos.zillowstatic.com/fp/a6bfc21b386f3e1144b05eb65b19daa3-cc_ft_960.jpg",
         "assets/properties/7903-canna.jpg",
-        ...redfinPhotos("543", "1680543", 32)
+        ...redfinPhotos("543", "1680543", 10)
       ]),
       description: {
         en: "Brick ranch in PRP with fenced back yard, finished basement, attached carport, two-car detached garage, stainless steel appliances, and flexible lower-level space.",
@@ -112,8 +109,8 @@
         "https://photos.zillowstatic.com/fp/d6ead7bb860641248f3f45fd9c0ac42f-cc_ft_960.jpg",
         "https://photos.zillowstatic.com/fp/d1e11fc6afd416a44ae4c74816268f67-cc_ft_960.jpg",
         "assets/properties/103-scottsdale.jpg",
-        ...redfinPhotos("043", "1712043", 35),
-        ...redfinPhotos("612", "1703612", 31)
+        ...redfinPhotos("043", "1712043", 10),
+        ...redfinPhotos("612", "1703612", 8)
       ]),
       description: {
         en: "Warm, well-maintained ranch with open kitchen and great room, updated kitchen, pantry, laundry area, covered front porch, patio, privacy-fenced yard, pool, and storage shed.",
@@ -134,7 +131,7 @@
       rent: 1538,
       image: "https://ssl.cdn-redfin.com/photo/185/bigphoto/443/1616443_1.jpg",
       fallbackImage: "assets/property-hero.jpg",
-      photos: uniquePhotos([...redfinPhotos("443", "1616443", 26)]),
+      photos: uniquePhotos([...redfinPhotos("443", "1616443", 12)]),
       description: {
         en: "Bright ranch in Silver Heights with three bedrooms, one full bath plus a half bath, an attached garage, porch, chain-link fencing, and a spacious back yard.",
         es: "Ranch claro en Silver Heights con tres habitaciones, un bano completo y medio bano, garaje, porche, cerca de chain link y un patio amplio."
@@ -154,7 +151,7 @@
       rent: 1522,
       image: "https://ssl.cdn-redfin.com/photo/185/bigphoto/968/1619968_1.jpg",
       fallbackImage: "assets/property-hero.jpg",
-      photos: uniquePhotos([...redfinPhotos("968", "1619968", 17)]),
+      photos: uniquePhotos([...redfinPhotos("968", "1619968", 12)]),
       description: {
         en: "Silver Heights ranch with three bedrooms, first-floor living, dining room, kitchen, driveway parking, and major systems reported replaced in recent years.",
         es: "Ranch en Silver Heights con tres habitaciones, distribucion en un solo nivel, comedor, cocina, parqueo en driveway y sistemas principales reportados como reemplazados en anos recientes."
