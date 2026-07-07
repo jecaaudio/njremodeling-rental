@@ -54,6 +54,7 @@
         <a href="index.html#services" data-i18n="navServices">Services</a>
         <a href="index.html#contact" data-i18n="navContact">Contact</a>
         <a href="dashboard.html" data-i18n="navPost">Post a property</a>
+        <a href="application.html" data-i18n="navApply">Apply</a>
         <a href="login.html" data-i18n="navLogin">Sign in</a>
       </nav>
       <div class="header-actions">
@@ -87,6 +88,7 @@
           navServices: "Services",
           navContact: "Contact",
           navPost: "Post a property",
+          navApply: "Apply",
           navLogin: "Sign in",
           backToRentals: "Back to rentals",
           detailEyebrow: "Property details",
@@ -103,6 +105,11 @@
           photosTitle: "Photos",
           sourceNote: "Photos are shown from site files or public listing sources when available.",
           viewZillow: "Open Zillow link",
+          applyNow: "Apply for this rental",
+          applySending: "Sending your application...",
+          applyDone: "Application sent! The owner will review it soon.",
+          applyExists: "You already applied to this property. Track it in your application page.",
+          applyError: "Could not send the application. Try again.",
           askAbout: "Ask about this rental",
           photoAlt: "Property photo",
           notFoundTitle: "Property not found.",
@@ -114,6 +121,7 @@
           navServices: "Servicios",
           navContact: "Contacto",
           navPost: "Publicar propiedad",
+          navApply: "Aplicar",
           navLogin: "Iniciar sesion",
           backToRentals: "Volver a rentas",
           detailEyebrow: "Detalles de la propiedad",
@@ -130,6 +138,11 @@
           photosTitle: "Fotos",
           sourceNote: "Las fotos se muestran desde archivos del sitio o fuentes públicas cuando están disponibles.",
           viewZillow: "Abrir enlace de Zillow",
+          applyNow: "Aplicar a esta renta",
+          applySending: "Enviando tu aplicacion...",
+          applyDone: "Aplicacion enviada! El propietario la revisara pronto.",
+          applyExists: "Ya aplicaste a esta propiedad. Puedes darle seguimiento en tu pagina de aplicacion.",
+          applyError: "No se pudo enviar la aplicacion. Intenta de nuevo.",
           askAbout: "Preguntar por esta renta",
           photoAlt: "Foto de la propiedad",
           notFoundTitle: "Propiedad no encontrada.",
@@ -230,9 +243,11 @@
                 </dl>
               </div>
               <div class="property-detail-actions">
-                <a class="button primary" href="mailto:njremodelingrental@gmail.com?subject=${encodeURIComponent(dictionary.askAbout + " " + property.title)}">${dictionary.askAbout}</a>
+                <button class="button primary" type="button" id="apply-button">${dictionary.applyNow}</button>
+                <a class="button neutral" href="mailto:njremodelingrental@gmail.com?subject=${encodeURIComponent(dictionary.askAbout + " " + property.title)}">${dictionary.askAbout}</a>
                 ${zillowLink}
               </div>
+              <p class="form-status" id="apply-status" aria-live="polite"></p>
             </section>
           </div>
         `;
@@ -243,6 +258,49 @@
             renderDetail();
           });
         });
+
+        // ===== Boton "Aplicar a esta renta" =====
+        const applyButton = detailRoot.querySelector("#apply-button");
+        const applyStatus = detailRoot.querySelector("#apply-status");
+        if (applyButton) {
+          // Si viene de regreso tras guardar su aplicacion, mostrar confirmacion.
+          if (new URLSearchParams(window.location.search).get("applied") === "1") {
+            applyStatus.textContent = dictionary.applyDone;
+          }
+          applyButton.addEventListener("click", async () => {
+            const client = window.supabaseClient;
+            const target = `application.html?apply=${encodeURIComponent(property.id)}`;
+            if (!client) { window.location.href = target; return; }
+            const { data } = await client.auth.getSession();
+            if (!data || !data.session) {
+              // Sin sesion: al login, y de ahi a llenar/confirmar su aplicacion.
+              window.location.href = "login.html?redirect=" + encodeURIComponent(target);
+              return;
+            }
+            const userId = data.session.user.id;
+            const { data: app } = await client
+              .from("tenant_applications")
+              .select("user_id")
+              .eq("user_id", userId)
+              .maybeSingle();
+            if (!app) {
+              // Aun no tiene aplicacion universal: que la llene primero.
+              window.location.href = target;
+              return;
+            }
+            applyStatus.textContent = dictionary.applySending;
+            const { error } = await client
+              .from("property_applications")
+              .insert({ property_id: property.id, applicant_id: userId });
+            if (!error) {
+              applyStatus.textContent = dictionary.applyDone;
+            } else if (String(error.code) === "23505") {
+              applyStatus.textContent = dictionary.applyExists;
+            } else {
+              applyStatus.textContent = dictionary.applyError;
+            }
+          });
+        }
 
         updateStructuredData(property, photos);
 

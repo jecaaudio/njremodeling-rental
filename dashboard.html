@@ -406,6 +406,23 @@
         </div>
 
       </div>
+
+      <!-- Aplicaciones recibidas de inquilinos -->
+      <div style="padding: 0 clamp(18px, 6vw, 84px) clamp(24px, 4vw, 40px); background: var(--paper);">
+        <section class="dash-editor" style="background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(21,32,27,0.07);">
+          <div class="dash-editor-head">
+            <div>
+              <p class="eyebrow">Tenants</p>
+              <h2>Applications received</h2>
+            </div>
+            <button class="button neutral" type="button" id="apps-refresh" style="background:rgba(255,255,255,0.12);color:#fff;border-color:rgba(255,255,255,0.25);">Refresh</button>
+          </div>
+          <div style="padding: 20px 24px;">
+            <p class="form-status" id="apps-status" aria-live="polite"></p>
+            <div id="apps-list" style="display:flex;flex-direction:column;gap:12px;"></div>
+          </div>
+        </section>
+      </div>
     </main>
 
     <footer class="site-footer">
@@ -753,6 +770,81 @@
         });
 
         loadProperties();
+
+        // ===== Aplicaciones recibidas de inquilinos =====
+        const appsStatus = document.querySelector("#apps-status");
+        const appsList = document.querySelector("#apps-list");
+
+        function appEscape(value) {
+          return String(value || "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+        }
+
+        async function loadApplications() {
+          appsStatus.textContent = "Loading applications...";
+          appsStatus.classList.remove("is-error");
+          const { data, error } = await client
+            .from("property_applications")
+            .select("id, status, created_at, property_id, applicant_id, properties ( title, city, owner_id ), tenant_applications ( full_name, phone, email, employer, monthly_income, occupants, has_pets, pets_description, desired_move_in, additional_info )")
+            .order("created_at", { ascending: false });
+          if (error) {
+            appsStatus.textContent = "Could not load applications. Make sure supabase/fase1-aplicaciones.sql was run.";
+            appsStatus.classList.add("is-error");
+            return;
+          }
+          const apps = data || [];
+          appsStatus.textContent = apps.length
+            ? `${apps.length} application(s) received.`
+            : "No applications yet. When a tenant applies to one of your properties, it will appear here.";
+          appsList.innerHTML = apps
+            .map((app) => {
+              const t = app.tenant_applications || {};
+              const prop = app.properties || {};
+              const date = new Date(app.created_at).toLocaleDateString("en-US");
+              const income = t.monthly_income != null ? `$${Number(t.monthly_income).toLocaleString("en-US")}/mo` : "-";
+              const pets = t.has_pets ? (t.pets_description || "Yes") : "No";
+              const statusColors = { submitted: "#8c6f4e", reviewed: "#33587e", accepted: "#2f6b4f", declined: "#a04338" };
+              return `
+                <article style="border:1px solid var(--line);border-radius:10px;padding:14px 16px;background:#fbfaf6;">
+                  <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:baseline;">
+                    <strong style="font-size:15px;">${appEscape(t.full_name || "Applicant")}</strong>
+                    <span style="font-size:12px;font-weight:800;color:${statusColors[app.status] || "#8c6f4e"};text-transform:uppercase;">${appEscape(app.status)}</span>
+                  </div>
+                  <p style="margin:4px 0 8px;font-size:13px;color:var(--muted);">
+                    ${appEscape(prop.title || "")} &middot; ${appEscape(date)}
+                  </p>
+                  <p style="margin:0 0 4px;font-size:13px;">
+                    📞 ${appEscape(t.phone || "-")} &middot; ✉️ ${appEscape(t.email || "-")}
+                  </p>
+                  <p style="margin:0 0 4px;font-size:13px;">
+                    Work: ${appEscape(t.employer || "-")} &middot; Income: ${appEscape(income)} &middot; Occupants: ${appEscape(t.occupants ?? "-")} &middot; Pets: ${appEscape(pets)}
+                  </p>
+                  ${t.desired_move_in ? `<p style="margin:0 0 4px;font-size:13px;">Move-in: ${appEscape(t.desired_move_in)}</p>` : ""}
+                  ${t.additional_info ? `<p style="margin:0 0 8px;font-size:13px;color:var(--muted);">"${appEscape(t.additional_info)}"</p>` : ""}
+                  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+                    <button class="button neutral" type="button" data-app-status="reviewed" data-app-id="${appEscape(app.id)}">Mark reviewed</button>
+                    <button class="button primary" type="button" data-app-status="accepted" data-app-id="${appEscape(app.id)}">Accept</button>
+                    <button class="button danger" type="button" data-app-status="declined" data-app-id="${appEscape(app.id)}">Decline</button>
+                  </div>
+                </article>
+              `;
+            })
+            .join("");
+        }
+
+        appsList.addEventListener("click", async (event) => {
+          const button = event.target.closest("[data-app-status]");
+          if (!button) return;
+          const newStatus = button.getAttribute("data-app-status");
+          if (newStatus === "declined" && !confirm("Decline this application?")) return;
+          await client
+            .from("property_applications")
+            .update({ status: newStatus })
+            .eq("id", button.getAttribute("data-app-id"));
+          await loadApplications();
+        });
+
+        document.querySelector("#apps-refresh").addEventListener("click", loadApplications);
+        loadApplications();
       }
     </script>
   </body>

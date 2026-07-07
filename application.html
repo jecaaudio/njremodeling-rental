@@ -1,0 +1,427 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Rental Application | NJ Remodeling and Rental</title>
+    <meta name="description" content="Fill out one rental application and use it to apply to any available property." />
+    <meta name="robots" content="noindex" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/png" href="assets/favicon.png" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="site-nav.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+    <script src="supabase-config.js"></script>
+    <style>
+      .app-banner {
+        background: linear-gradient(135deg, var(--green-dark, #14261d) 0%, #1a3d2e 100%);
+        padding: clamp(32px, 5vw, 56px) clamp(18px, 6vw, 84px);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        flex-wrap: wrap;
+      }
+      .app-banner .eyebrow { color: #f0c776; margin-bottom: 6px; }
+      .app-banner h1 { color: #fff; margin: 0 0 6px; font-size: clamp(22px, 3vw, 32px); }
+      .app-banner p { color: rgba(255,255,255,0.72); margin: 0; font-size: 15px; max-width: 640px; }
+      .app-banner-actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+      .app-banner-actions #account-email { color: rgba(255,255,255,0.8); font-size: 14px; background: rgba(255,255,255,0.1); border-radius: 20px; padding: 6px 14px; }
+
+      .app-body {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(260px, 0.4fr);
+        gap: 24px;
+        padding: clamp(20px, 4vw, 40px) clamp(18px, 6vw, 84px);
+        align-items: start;
+        background: var(--paper, #f4f1e9);
+        min-height: 60vh;
+      }
+      @media (max-width: 900px) { .app-body { grid-template-columns: 1fr; } }
+
+      .app-card {
+        background: #fff;
+        border: 1px solid var(--line, #e3ded1);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(21,32,27,0.07);
+      }
+      .app-card-head { background: var(--green-dark, #14261d); padding: 18px 24px; }
+      .app-card-head .eyebrow { color: #f0c776; margin: 0 0 2px; }
+      .app-card-head h2 { color: #fff; margin: 0; font-size: 15px; font-weight: 700; }
+
+      .app-form { padding: 24px; display: flex; flex-direction: column; }
+      .app-section-label {
+        font-size: 11px; font-weight: 800; color: var(--clay, #8c6f4e);
+        text-transform: uppercase; letter-spacing: 0.06em;
+        margin: 20px 0 10px; padding-bottom: 6px;
+        border-bottom: 1px solid var(--line, #e3ded1);
+      }
+      .app-section-label:first-of-type { margin-top: 0; }
+      .app-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      .app-grid .full { grid-column: 1 / -1; }
+      @media (max-width: 560px) { .app-grid { grid-template-columns: 1fr; } }
+      .app-form label { display: flex; flex-direction: column; gap: 5px; font-size: 13px; font-weight: 600; color: var(--ink, #22302a); }
+      .app-form input, .app-form textarea, .app-form select {
+        border: 1px solid var(--line, #e3ded1); border-radius: 7px; padding: 9px 12px;
+        font-size: 14px; font-family: inherit; background: #fbfaf6; color: var(--ink, #22302a);
+      }
+      .app-form input:focus, .app-form textarea:focus { outline: none; border-color: var(--green, #2f6b4f); background: #fff; }
+      .app-form textarea { resize: vertical; min-height: 80px; }
+      .app-form-actions { display: flex; gap: 10px; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--line, #e3ded1); flex-wrap: wrap; align-items: center; }
+
+      .my-apps { padding: 18px; display: flex; flex-direction: column; gap: 10px; }
+      .my-app-item { border: 1px solid var(--line, #e3ded1); border-radius: 9px; padding: 12px 14px; background: #fbfaf6; }
+      .my-app-item strong { display: block; font-size: 14px; color: var(--ink, #22302a); }
+      .my-app-item small { color: var(--muted, #6f7a72); font-size: 12px; }
+      .app-pill { display: inline-block; font-size: 11px; font-weight: 800; border-radius: 20px; padding: 3px 10px; margin-top: 6px; }
+      .app-pill.submitted { background: #f4ead1; color: #8c6f4e; }
+      .app-pill.reviewed { background: #dbe7f4; color: #33587e; }
+      .app-pill.accepted { background: #d9efdf; color: #2f6b4f; }
+      .app-pill.declined { background: #f4dcd9; color: #a04338; }
+    </style>
+  </head>
+  <body>
+    <header class="site-header">
+      <a class="brand" href="index.html" aria-label="NJ Remodeling and Rental home">
+        <span class="brand-mark"><img src="assets/favicon.png" alt="" /></span>
+        <span>
+          <strong>NJ Remodeling and Rental</strong>
+          <small>Jansel E. Cutino &middot; Louisville, KY</small>
+        </span>
+      </a>
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="index.html" data-i18n="navHome">Home</a>
+        <a href="rentals.html" data-i18n="navRentals">Rentals</a>
+        <a href="index.html#contact" data-i18n="navContact">Contact</a>
+      </nav>
+      <div class="header-actions">
+        <div class="language-switch" role="group" aria-label="Language">
+          <button class="language-option is-active" type="button" data-lang="en">EN</button>
+          <button class="language-option" type="button" data-lang="es">ES</button>
+        </div>
+        <a class="header-cta" href="tel:+15025540333">502-554-0333</a>
+      </div>
+    </header>
+
+    <main>
+      <div class="app-banner">
+        <div>
+          <p class="eyebrow" data-i18n="bannerEyebrow">Rental application</p>
+          <h1 data-i18n="bannerTitle">One application for every property</h1>
+          <p data-i18n="bannerText">Fill this out once. Then apply to any available rental with a single tap - no repeated paperwork.</p>
+        </div>
+        <div class="app-banner-actions">
+          <span id="account-email"></span>
+          <button class="button neutral" type="button" id="logout-button" style="background:rgba(255,255,255,0.12);color:#fff;border-color:rgba(255,255,255,0.25);" data-i18n="signOut">Sign out</button>
+        </div>
+      </div>
+
+      <div class="app-body">
+        <section class="app-card">
+          <div class="app-card-head">
+            <p class="eyebrow" data-i18n="formEyebrow">Your information</p>
+            <h2 data-i18n="formTitle">Universal application</h2>
+          </div>
+          <form class="app-form" id="application-form">
+            <p class="app-section-label" data-i18n="secContact">Contact</p>
+            <div class="app-grid">
+              <label class="full">
+                <span data-i18n="fullName">Full name</span>
+                <input type="text" name="full_name" required />
+              </label>
+              <label>
+                <span data-i18n="phone">Phone</span>
+                <input type="tel" name="phone" required />
+              </label>
+              <label>
+                <span data-i18n="email">Email</span>
+                <input type="email" name="email" required />
+              </label>
+              <label class="full">
+                <span data-i18n="currentAddress">Current address</span>
+                <input type="text" name="current_address" required />
+              </label>
+            </div>
+
+            <p class="app-section-label" data-i18n="secWork">Employment and income</p>
+            <div class="app-grid">
+              <label>
+                <span data-i18n="employer">Employer / business</span>
+                <input type="text" name="employer" required />
+              </label>
+              <label>
+                <span data-i18n="jobTitle">Job / role</span>
+                <input type="text" name="job_title" />
+              </label>
+              <label>
+                <span data-i18n="employmentTime">Time in this job</span>
+                <input type="text" name="employment_time" data-i18n-placeholder="employmentTimeHint" placeholder="e.g. 2 years" />
+              </label>
+              <label>
+                <span data-i18n="monthlyIncome">Monthly income (USD)</span>
+                <input type="number" name="monthly_income" min="0" step="50" required />
+              </label>
+            </div>
+
+            <p class="app-section-label" data-i18n="secHousehold">Household</p>
+            <div class="app-grid">
+              <label>
+                <span data-i18n="occupants">Number of occupants</span>
+                <input type="number" name="occupants" min="1" max="20" required />
+              </label>
+              <label>
+                <span data-i18n="hasPets">Pets?</span>
+                <select name="has_pets">
+                  <option value="no" data-i18n="petsNo">No</option>
+                  <option value="yes" data-i18n="petsYes">Yes</option>
+                </select>
+              </label>
+              <label class="full">
+                <span data-i18n="petsDescription">If yes, describe them (type, size)</span>
+                <input type="text" name="pets_description" />
+              </label>
+              <label>
+                <span data-i18n="moveIn">Desired move-in date</span>
+                <input type="date" name="desired_move_in" />
+              </label>
+            </div>
+
+            <p class="app-section-label" data-i18n="secReference">Reference</p>
+            <div class="app-grid">
+              <label>
+                <span data-i18n="referenceName">Reference name</span>
+                <input type="text" name="reference_name" />
+              </label>
+              <label>
+                <span data-i18n="referencePhone">Reference phone</span>
+                <input type="tel" name="reference_phone" />
+              </label>
+              <label class="full">
+                <span data-i18n="additionalInfo">Anything else the landlord should know?</span>
+                <textarea name="additional_info"></textarea>
+              </label>
+            </div>
+
+            <div class="app-form-actions">
+              <button class="button primary" type="submit" data-i18n="saveButton">Save my application</button>
+              <span class="form-status" id="app-status" aria-live="polite"></span>
+            </div>
+          </form>
+        </section>
+
+        <section class="app-card">
+          <div class="app-card-head">
+            <p class="eyebrow" data-i18n="myAppsEyebrow">Tracking</p>
+            <h2 data-i18n="myAppsTitle">My applications</h2>
+          </div>
+          <div class="my-apps" id="my-apps">
+            <p class="form-status" id="my-apps-status"></p>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <script>
+      const translations = {
+        en: {
+          navHome: "Home", navRentals: "Rentals", navContact: "Contact",
+          bannerEyebrow: "Rental application",
+          bannerTitle: "One application for every property",
+          bannerText: "Fill this out once. Then apply to any available rental with a single tap - no repeated paperwork.",
+          signOut: "Sign out",
+          formEyebrow: "Your information", formTitle: "Universal application",
+          secContact: "Contact", fullName: "Full name", phone: "Phone", email: "Email", currentAddress: "Current address",
+          secWork: "Employment and income", employer: "Employer / business", jobTitle: "Job / role",
+          employmentTime: "Time in this job", employmentTimeHint: "e.g. 2 years", monthlyIncome: "Monthly income (USD)",
+          secHousehold: "Household", occupants: "Number of occupants", hasPets: "Pets?", petsNo: "No", petsYes: "Yes",
+          petsDescription: "If yes, describe them (type, size)", moveIn: "Desired move-in date",
+          secReference: "Reference", referenceName: "Reference name", referencePhone: "Reference phone",
+          additionalInfo: "Anything else the landlord should know?",
+          saveButton: "Save my application",
+          myAppsEyebrow: "Tracking", myAppsTitle: "My applications",
+          saved: "Application saved. You can now apply to any property.",
+          saveError: "Could not save. Check the required fields and try again.",
+          loading: "Loading...",
+          noApps: "You have not applied to any property yet. Browse rentals and tap Apply.",
+          appliedOn: "Applied on",
+          statusNames: { submitted: "Submitted", reviewed: "Reviewed", accepted: "Accepted", declined: "Declined" }
+        },
+        es: {
+          navHome: "Inicio", navRentals: "Rentas", navContact: "Contacto",
+          bannerEyebrow: "Aplicacion de renta",
+          bannerTitle: "Una sola aplicacion para todas las propiedades",
+          bannerText: "Llenala una vez. Despues aplica a cualquier renta disponible con un solo toque, sin repetir papeleo.",
+          signOut: "Cerrar sesion",
+          formEyebrow: "Tu informacion", formTitle: "Aplicacion universal",
+          secContact: "Contacto", fullName: "Nombre completo", phone: "Telefono", email: "Correo", currentAddress: "Direccion actual",
+          secWork: "Empleo e ingresos", employer: "Empleador / negocio", jobTitle: "Puesto",
+          employmentTime: "Tiempo en este empleo", employmentTimeHint: "ej. 2 anos", monthlyIncome: "Ingreso mensual (USD)",
+          secHousehold: "Hogar", occupants: "Numero de ocupantes", hasPets: "Mascotas?", petsNo: "No", petsYes: "Si",
+          petsDescription: "Si tienes, describelas (tipo, tamano)", moveIn: "Fecha deseada de mudanza",
+          secReference: "Referencia", referenceName: "Nombre de referencia", referencePhone: "Telefono de referencia",
+          additionalInfo: "Algo mas que el propietario deba saber?",
+          saveButton: "Guardar mi aplicacion",
+          myAppsEyebrow: "Seguimiento", myAppsTitle: "Mis aplicaciones",
+          saved: "Aplicacion guardada. Ya puedes aplicar a cualquier propiedad.",
+          saveError: "No se pudo guardar. Revisa los campos obligatorios e intenta de nuevo.",
+          loading: "Cargando...",
+          noApps: "Aun no has aplicado a ninguna propiedad. Explora las rentas y toca Aplicar.",
+          appliedOn: "Aplicaste el",
+          statusNames: { submitted: "Enviada", reviewed: "Revisada", accepted: "Aceptada", declined: "Rechazada" }
+        }
+      };
+
+      const storage = {
+        get(key) { try { return localStorage.getItem(key); } catch { return null; } },
+        set(key, value) { try { localStorage.setItem(key, value); } catch {} }
+      };
+      let currentLanguage = storage.get("nj-language") === "es" ? "es" : "en";
+
+      function dict() { return translations[currentLanguage]; }
+
+      function applyLanguage(lang) {
+        currentLanguage = lang;
+        storage.set("nj-language", lang);
+        document.documentElement.lang = lang;
+        const d = dict();
+        document.querySelectorAll("[data-i18n]").forEach((el) => {
+          const key = el.getAttribute("data-i18n");
+          if (d[key]) el.textContent = d[key];
+        });
+        document.querySelectorAll("[data-i18n-placeholder]").forEach((el) => {
+          const key = el.getAttribute("data-i18n-placeholder");
+          if (d[key]) el.setAttribute("placeholder", d[key]);
+        });
+        document.querySelectorAll(".language-option").forEach((btn) => {
+          btn.classList.toggle("is-active", btn.getAttribute("data-lang") === lang);
+        });
+      }
+
+      document.querySelectorAll(".language-option").forEach((btn) => {
+        btn.addEventListener("click", () => { applyLanguage(btn.getAttribute("data-lang")); loadMyApps(); });
+      });
+
+      const form = document.querySelector("#application-form");
+      const statusEl = document.querySelector("#app-status");
+      const myApps = document.querySelector("#my-apps");
+      const myAppsStatus = document.querySelector("#my-apps-status");
+      let userId = null;
+
+      function setStatus(text, isError) {
+        statusEl.textContent = text;
+        statusEl.classList.toggle("is-error", Boolean(isError));
+      }
+
+      function escapeHtml(value) {
+        return String(value || "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;");
+      }
+
+      async function loadApplication(client) {
+        const { data } = await client.from("tenant_applications").select("*").eq("user_id", userId).maybeSingle();
+        if (!data) return;
+        const set = (name, value) => { if (form.elements[name] && value != null) form.elements[name].value = value; };
+        set("full_name", data.full_name); set("phone", data.phone); set("email", data.email);
+        set("current_address", data.current_address); set("employer", data.employer); set("job_title", data.job_title);
+        set("employment_time", data.employment_time); set("monthly_income", data.monthly_income);
+        set("occupants", data.occupants); set("pets_description", data.pets_description);
+        set("reference_name", data.reference_name); set("reference_phone", data.reference_phone);
+        set("desired_move_in", data.desired_move_in); set("additional_info", data.additional_info);
+        form.elements.has_pets.value = data.has_pets ? "yes" : "no";
+      }
+
+      async function loadMyApps() {
+        const client = window.supabaseClient;
+        if (!client || !userId) return;
+        const d = dict();
+        myAppsStatus.textContent = d.loading;
+        const { data, error } = await client
+          .from("property_applications")
+          .select("id, status, created_at, properties ( title, city, state )")
+          .eq("applicant_id", userId)
+          .order("created_at", { ascending: false });
+        if (error) { myAppsStatus.textContent = d.saveError; return; }
+        const apps = data || [];
+        myAppsStatus.textContent = apps.length ? "" : d.noApps;
+        myApps.querySelectorAll(".my-app-item").forEach((el) => el.remove());
+        apps.forEach((app) => {
+          const item = document.createElement("article");
+          item.className = "my-app-item";
+          const prop = app.properties || {};
+          const date = new Date(app.created_at).toLocaleDateString(currentLanguage === "es" ? "es-US" : "en-US");
+          item.innerHTML = `
+            <strong>${escapeHtml(prop.title || "")}</strong>
+            <small>${escapeHtml([prop.city, prop.state].filter(Boolean).join(", "))} &middot; ${d.appliedOn} ${escapeHtml(date)}</small>
+            <div><span class="app-pill ${escapeHtml(app.status)}">${escapeHtml(d.statusNames[app.status] || app.status)}</span></div>
+          `;
+          myApps.appendChild(item);
+        });
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const client = window.supabaseClient;
+        if (!client || !userId) return;
+        const d = dict();
+        setStatus(d.loading);
+        const fd = new FormData(form);
+        const row = {
+          user_id: userId,
+          full_name: String(fd.get("full_name") || "").trim(),
+          phone: String(fd.get("phone") || "").trim(),
+          email: String(fd.get("email") || "").trim(),
+          current_address: String(fd.get("current_address") || "").trim(),
+          employer: String(fd.get("employer") || "").trim(),
+          job_title: String(fd.get("job_title") || "").trim(),
+          employment_time: String(fd.get("employment_time") || "").trim(),
+          monthly_income: fd.get("monthly_income") ? Number(fd.get("monthly_income")) : null,
+          occupants: fd.get("occupants") ? Number(fd.get("occupants")) : null,
+          has_pets: fd.get("has_pets") === "yes",
+          pets_description: String(fd.get("pets_description") || "").trim(),
+          reference_name: String(fd.get("reference_name") || "").trim(),
+          reference_phone: String(fd.get("reference_phone") || "").trim(),
+          desired_move_in: fd.get("desired_move_in") || null,
+          additional_info: String(fd.get("additional_info") || "").trim(),
+          updated_at: new Date().toISOString()
+        };
+        const { error } = await client.from("tenant_applications").upsert(row);
+        if (error) { setStatus(d.saveError, true); return; }
+        setStatus(d.saved);
+        // Si venia de una propiedad ("Aplicar"), aplicar automaticamente y regresar.
+        const params = new URLSearchParams(window.location.search);
+        const applyTo = params.get("apply");
+        if (applyTo) {
+          await client.from("property_applications").upsert(
+            { property_id: applyTo, applicant_id: userId },
+            { onConflict: "property_id,applicant_id", ignoreDuplicates: true }
+          );
+          window.location.href = `property.html?id=${encodeURIComponent(applyTo)}&applied=1`;
+          return;
+        }
+        loadMyApps();
+      });
+
+      document.querySelector("#logout-button").addEventListener("click", async () => {
+        if (window.supabaseClient) await window.supabaseClient.auth.signOut();
+        window.location.href = "login.html";
+      });
+
+      (async () => {
+        applyLanguage(currentLanguage);
+        const client = window.supabaseClient;
+        if (!client) { setStatus("Config error.", true); return; }
+        const { data } = await client.auth.getSession();
+        if (!data || !data.session) {
+          const target = "application.html" + window.location.search;
+          window.location.href = "login.html?redirect=" + encodeURIComponent(target);
+          return;
+        }
+        userId = data.session.user.id;
+        document.querySelector("#account-email").textContent = data.session.user.email || "";
+        if (!form.elements.email.value) form.elements.email.value = data.session.user.email || "";
+        await loadApplication(client);
+        await loadMyApps();
+      })();
+    </script>
+  </body>
+</html>
