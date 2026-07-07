@@ -31,6 +31,8 @@
       description: { en: row.description_en || "", es: row.description_es || "" },
       zillowUrl: row.zillow_url || "",
       approved: Boolean(row.approved),
+      rejected: Boolean(row.rejected),
+      rejectionReason: row.rejection_reason || "",
       createdAt: row.created_at
     };
   }

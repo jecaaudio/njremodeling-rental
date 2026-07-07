@@ -6,10 +6,34 @@
   </url>
   <url>
     <loc>https://jecaaudio.github.io/njremodeling-rental/rentals.html</loc>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://jecaaudio.github.io/njremodeling-rental/property.html</loc>
-    <priority>0.6</priority>
+    <loc>https://jecaaudio.github.io/njremodeling-rental/property.html?id=73561400</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://jecaaudio.github.io/njremodeling-rental/property.html?id=73587912</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://jecaaudio.github.io/njremodeling-rental/property.html?id=73577696</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://jecaaudio.github.io/njremodeling-rental/property.html?id=73547767</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://jecaaudio.github.io/njremodeling-rental/property.html?id=73541489</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://jecaaudio.github.io/njremodeling-rental/property.html?id=73649367</loc>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://jecaaudio.github.io/njremodeling-rental/login.html</loc>
+    <priority>0.4</priority>
   </url>
 </urlset>

@@ -10,7 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="icon" type="image/png" href="assets/favicon.png" />
     <link rel="apple-touch-icon" href="assets/favicon.png" />
-    <link rel="stylesheet" href="styles.min.css" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="site-nav.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script src="supabase-config.js"></script>
     <style>
@@ -172,6 +173,7 @@
                 <button class="button primary" type="submit" id="auth-submit" data-i18n="signInButton">Sign in</button>
                 <button class="button neutral" type="button" id="toggle-mode" data-i18n="needAccount">Need an account? Sign up</button>
               </div>
+              <button type="button" id="forgot-password" data-i18n="forgotPassword" style="background:none;border:0;padding:8px 0 0;color:var(--accent, #7cc7a5);font-size:14px;cursor:pointer;text-decoration:underline;text-align:left;">Forgot your password?</button>
             </form>
           </div>
         </div>
@@ -210,7 +212,11 @@
           working: "Working...",
           signedIn: "Signed in. Redirecting...",
           checkEmail: "Account created. Check your email to confirm, then sign in.",
-          genericError: "Something went wrong. Check your email and password."
+          genericError: "Something went wrong. Check your email and password.",
+          forgotPassword: "Forgot your password?",
+          resetPrompt: "Type your account email and press OK to receive a reset link.",
+          resetSent: "If that email has an account, a password reset link was sent. Check your inbox.",
+          resetError: "Could not send the reset email. Try again."
         },
         es: {
           navHome: "Inicio",
@@ -232,7 +238,11 @@
           working: "Procesando...",
           signedIn: "Sesion iniciada. Redirigiendo...",
           checkEmail: "Cuenta creada. Revisa tu correo para confirmar y luego inicia sesion.",
-          genericError: "Algo salio mal. Revisa tu correo y contrasena."
+          genericError: "Algo salio mal. Revisa tu correo y contrasena.",
+          forgotPassword: "Olvidaste tu contrasena?",
+          resetPrompt: "Escribe el correo de tu cuenta y presiona OK para recibir un enlace de recuperacion.",
+          resetSent: "Si ese correo tiene cuenta, se envio un enlace para restablecer la contrasena. Revisa tu bandeja.",
+          resetError: "No se pudo enviar el correo de recuperacion. Intenta de nuevo."
         }
       };
 
@@ -297,6 +307,27 @@
         applyMode();
       });
 
+      document.querySelector("#forgot-password").addEventListener("click", async () => {
+        const dict = dictionary();
+        if (!window.supabaseClient) {
+          setStatus(dict.genericError, true);
+          return;
+        }
+        const current = form.elements.email.value.trim();
+        const email = prompt(dict.resetPrompt, current);
+        if (!email) return;
+        setStatus(dict.working);
+        try {
+          const { error } = await window.supabaseClient.auth.resetPasswordForEmail(email.trim(), {
+            redirectTo: window.location.origin + window.location.pathname.replace("login.html", "") + "login.html"
+          });
+          if (error) throw error;
+          setStatus(dict.resetSent);
+        } catch (error) {
+          setStatus(dict.resetError, true);
+        }
+      });
+
       form.addEventListener("submit", async (event) => {
         event.preventDefault();
         const dict = dictionary();
@@ -338,6 +369,34 @@
 
       (async () => {
         if (!window.supabaseClient) return;
+
+        // Si el usuario llega desde el correo de "restablecer contrasena",
+        // le pedimos la nueva contrasena aqui mismo.
+        const isRecovery = window.location.hash.includes("type=recovery");
+        if (isRecovery) {
+          window.supabaseClient.auth.onAuthStateChange(async (event) => {
+            if (event !== "PASSWORD_RECOVERY" && event !== "SIGNED_IN") return;
+            const esLang = currentLanguage === "es";
+            const newPassword = prompt(
+              esLang
+                ? "Escribe tu nueva contrasena (minimo 6 caracteres):"
+                : "Type your new password (at least 6 characters):"
+            );
+            if (!newPassword || newPassword.length < 6) {
+              setStatus(esLang ? "La contrasena debe tener al menos 6 caracteres." : "Password must be at least 6 characters.", true);
+              return;
+            }
+            const { error } = await window.supabaseClient.auth.updateUser({ password: newPassword });
+            if (error) {
+              setStatus(error.message, true);
+              return;
+            }
+            setStatus(esLang ? "Contrasena actualizada. Entrando..." : "Password updated. Signing you in...");
+            window.location.href = "dashboard.html";
+          });
+          return;
+        }
+
         const { data } = await window.supabaseClient.auth.getSession();
         if (data && data.session) {
           window.location.href = "dashboard.html";

@@ -11,7 +11,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="icon" type="image/png" href="assets/favicon.png" />
     <link rel="apple-touch-icon" href="assets/favicon.png" />
-    <link rel="stylesheet" href="styles.min.css" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="site-nav.js" defer></script>
     <script src="properties-data.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script src="supabase-config.js"></script>
@@ -38,39 +39,17 @@
       </div>
     </header>
 
-    <section class="admin-page" id="admin-lock" aria-labelledby="admin-lock-title">
-      <form class="admin-form" id="admin-lock-form" style="max-width: 360px; margin: 4rem auto;">
-        <div class="admin-panel-heading">
-          <div>
-            <p class="eyebrow">Acceso restringido</p>
-            <h2 id="admin-lock-title">Panel de administracion</h2>
-          </div>
-        </div>
-        <label>
-          <span>Contrasena</span>
-          <input type="password" id="admin-lock-password" autocomplete="current-password" required />
-        </label>
-        <p class="form-status" id="admin-lock-status" aria-live="polite"></p>
-        <div class="admin-form-actions">
-          <button class="button primary" type="submit">Entrar</button>
-        </div>
-      </form>
-    </section>
 
-    <main class="admin-page" id="admin-content" hidden>
+    <main class="admin-page" id="admin-content">
       <section class="admin-hero">
         <div>
           <p class="eyebrow">Panel interno</p>
           <h1>Gestionar propiedades</h1>
-          <p>Agrega casas, edita detalles, sube fotos y publica cambios en la seccion de rentas.</p>
+          <p>Aprueba o rechaza solicitudes, revisa mensajes de clientes y administra las casas publicadas.</p>
         </div>
         <div class="admin-hero-actions">
-          <button class="button primary" type="button" id="new-property-button">Nueva casa</button>
-          <button class="button neutral" type="button" id="export-button">Exportar respaldo</button>
-          <label class="button neutral import-button">
-            Importar respaldo
-            <input type="file" id="import-file" accept="application/json" />
-          </label>
+          <a class="button primary" href="dashboard.html">Publicar / editar propiedades</a>
+          <button class="button neutral" type="button" id="sign-out-button">Cerrar sesion</button>
         </div>
       </section>
 
@@ -86,115 +65,18 @@
         <div class="admin-pending-list" id="pending-list"></div>
       </section>
 
-      <section class="admin-layout">
-        <aside class="admin-sidebar">
-          <div class="admin-panel-heading">
-            <div>
-              <p class="eyebrow">Inventario local (legado)</p>
-              <h2>Casas</h2>
-            </div>
-            <span id="property-count">0</span>
+      <section class="admin-pending-section" id="leads-section">
+        <div class="admin-panel-heading">
+          <div>
+            <p class="eyebrow">Formulario de contacto</p>
+            <h2>Mensajes de clientes</h2>
           </div>
-          <div class="admin-property-list" id="property-list"></div>
-          <button class="button neutral full-button" type="button" id="reset-button">Restaurar original</button>
-        </aside>
-
-        <section class="admin-editor">
-          <form class="admin-form" id="property-form">
-            <input type="hidden" name="id" />
-
-            <div class="admin-panel-heading">
-              <div>
-                <p class="eyebrow">Datos</p>
-                <h2 id="editor-title">Propiedad</h2>
-              </div>
-              <a class="button neutral" id="view-property-link" href="rentals.html">Ver</a>
-            </div>
-
-            <div class="admin-form-grid">
-              <label>
-                <span>Nombre</span>
-                <input type="text" name="title" placeholder="5903 Jessamine Ln" required />
-              </label>
-              <label>
-                <span>Direccion</span>
-                <input type="text" name="address" placeholder="5903 Jessamine Ln" required />
-              </label>
-              <label>
-                <span>Ciudad</span>
-                <input type="text" name="city" placeholder="Louisville" required />
-              </label>
-              <label>
-                <span>Estado</span>
-                <input type="text" name="state" maxlength="2" placeholder="KY" required />
-              </label>
-              <label>
-                <span>ZIP</span>
-                <input type="text" name="zip" placeholder="40258" />
-              </label>
-              <label>
-                <span>Habitaciones</span>
-                <input type="number" name="bedrooms" min="0" step="1" placeholder="3" required />
-              </label>
-              <label>
-                <span>Banos</span>
-                <input type="number" name="bathrooms" min="0" step="0.5" placeholder="1" required />
-              </label>
-              <label>
-                <span>Pies cuadrados</span>
-                <input type="number" name="sqft" min="0" step="1" placeholder="1200" required />
-              </label>
-              <label>
-                <span>Renta para filtro</span>
-                <input type="number" name="rent" min="0" step="1" placeholder="Opcional" />
-              </label>
-              <label>
-                <span>Enlace de Zillow</span>
-                <input type="url" name="zillowUrl" placeholder="https://www.zillow.com/..." />
-              </label>
-            </div>
-
-            <label>
-              <span>Descripcion en ingles</span>
-              <textarea name="descriptionEn" rows="4" placeholder="Describe the rental, updates, location, and useful details."></textarea>
-            </label>
-
-            <label>
-              <span>Descripcion en espanol</span>
-              <textarea name="descriptionEs" rows="4" placeholder="Describe la renta, renovaciones, ubicacion y detalles utiles."></textarea>
-            </label>
-
-            <section class="admin-photo-section" aria-labelledby="photos-heading">
-              <div class="admin-panel-heading">
-                <div>
-                  <p class="eyebrow">Galeria</p>
-                  <h2 id="photos-heading">Fotos</h2>
-                </div>
-                <span id="photo-count">0</span>
-              </div>
-
-              <div class="admin-photo-grid" id="photo-grid"></div>
-
-              <div class="admin-photo-tools">
-                <label class="photo-upload">
-                  <span>Subir fotos</span>
-                  <input type="file" id="photo-files" accept="image/*" multiple />
-                </label>
-                <div class="admin-url-row">
-                  <input type="url" id="photo-url" placeholder="Pegar enlace de foto" />
-                  <button class="button neutral" type="button" id="add-photo-url">Agregar enlace</button>
-                </div>
-              </div>
-            </section>
-
-            <div class="admin-form-actions">
-              <button class="button primary" type="submit">Guardar cambios</button>
-              <button class="button danger" type="button" id="delete-button">Quitar casa</button>
-            </div>
-            <p class="form-status" id="admin-status" aria-live="polite"></p>
-          </form>
-        </section>
+          <button class="button neutral" type="button" id="leads-refresh">Actualizar</button>
+        </div>
+        <p class="form-status" id="leads-status" aria-live="polite">Verificando sesion...</p>
+        <div class="admin-pending-list" id="leads-list"></div>
       </section>
+
     </main>
 
     <footer class="site-footer">
@@ -206,364 +88,14 @@
     </footer>
 
     <script>
-      const ADMIN_PASSWORD_HASH = "10b8b44f7124feb0c609e408619f5bb082b248f0578a01e59b035b653f5deb40";
-      const ADMIN_UNLOCK_KEY = "nj-admin-unlocked-v1";
-      const lockSection = document.querySelector("#admin-lock");
-      const lockForm = document.querySelector("#admin-lock-form");
-      const lockPassword = document.querySelector("#admin-lock-password");
-      const lockStatus = document.querySelector("#admin-lock-status");
-      const adminContent = document.querySelector("#admin-content");
+      // El acceso al panel ahora depende unicamente de la cuenta de
+      // administrador de Supabase (seguridad real de servidor).
+      initPendingApprovals();
 
-      async function hashPassword(value) {
-        const bytes = new TextEncoder().encode(value);
-        const digest = await crypto.subtle.digest("SHA-256", bytes);
-        return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
-      }
-
-      function unlockAdmin() {
-        lockSection.hidden = true;
-        adminContent.hidden = false;
-        initAdmin();
-        initPendingApprovals();
-      }
-
-      if (sessionStorage.getItem(ADMIN_UNLOCK_KEY) === "1") {
-        unlockAdmin();
-      } else {
-        lockForm.addEventListener("submit", async (event) => {
-          event.preventDefault();
-          const hash = await hashPassword(lockPassword.value);
-          if (hash === ADMIN_PASSWORD_HASH) {
-            sessionStorage.setItem(ADMIN_UNLOCK_KEY, "1");
-            unlockAdmin();
-          } else {
-            lockStatus.textContent = "Contrasena incorrecta.";
-            lockStatus.classList.add("is-error");
-            lockPassword.value = "";
-            lockPassword.focus();
-          }
-        });
-      }
-
-      function initAdmin() {
-      const propertiesApi = window.NJProperties;
-      const propertyList = document.querySelector("#property-list");
-      const propertyCount = document.querySelector("#property-count");
-      const photoCount = document.querySelector("#photo-count");
-      const photoGrid = document.querySelector("#photo-grid");
-      const form = document.querySelector("#property-form");
-      const editorTitle = document.querySelector("#editor-title");
-      const statusText = document.querySelector("#admin-status");
-      const viewPropertyLink = document.querySelector("#view-property-link");
-      const newPropertyButton = document.querySelector("#new-property-button");
-      const deleteButton = document.querySelector("#delete-button");
-      const resetButton = document.querySelector("#reset-button");
-      const exportButton = document.querySelector("#export-button");
-      const importFile = document.querySelector("#import-file");
-      const photoFiles = document.querySelector("#photo-files");
-      const photoUrl = document.querySelector("#photo-url");
-      const addPhotoUrl = document.querySelector("#add-photo-url");
-
-      let properties = propertiesApi.load(propertiesApi.defaultProperties);
-      let selectedId = properties[0] ? properties[0].id : "";
-      let draftPhotos = [];
-
-      function escapeHtml(value) {
-        return String(value || "")
-          .replaceAll("&", "&amp;")
-          .replaceAll("<", "&lt;")
-          .replaceAll(">", "&gt;")
-          .replaceAll('"', "&quot;");
-      }
-
-      function setStatus(message, isError = false) {
-        statusText.textContent = message;
-        statusText.classList.toggle("is-error", isError);
-      }
-
-      function currentProperty() {
-        return properties.find((property) => property.id === selectedId) || properties[0] || null;
-      }
-
-      function buildEmptyProperty() {
-        return propertiesApi.normalize({
-          id: `manual-${Date.now()}`,
-          title: "Nueva casa",
-          address: "",
-          city: "Louisville",
-          state: "KY",
-          zip: "",
-          bedrooms: 3,
-          bathrooms: 1,
-          sqft: 1000,
-          rent: null,
-          photos: ["assets/property-hero.jpg"],
-          description: { en: "", es: "" },
-          zillowUrl: ""
-        });
-      }
-
-      function saveProperties(message = "Guardado.") {
-        const result = propertiesApi.save(properties);
-        if (!result.ok) {
-          setStatus("No se pudo guardar. Reduce la cantidad de fotos o exporta un respaldo.", true);
-          return false;
-        }
-        setStatus(message);
-        return true;
-      }
-
-      function renderList() {
-        propertyCount.textContent = String(properties.length);
-        propertyList.innerHTML = properties
-          .map((property) => {
-            const cover = property.photos && property.photos[0] ? property.photos[0] : property.fallbackImage;
-            const isActive = property.id === selectedId ? " is-active" : "";
-            return `
-              <button class="admin-property-item${isActive}" type="button" data-property-id="${escapeHtml(property.id)}">
-                <img src="${escapeHtml(cover)}" alt="" onerror="this.style.visibility='hidden'" />
-                <span>
-                  <strong>${escapeHtml(property.title)}</strong>
-                  <small>${escapeHtml(property.city)}, ${escapeHtml(property.state)} ${escapeHtml(property.zip)}</small>
-                </span>
-              </button>
-            `;
-          })
-          .join("");
-      }
-
-      function renderPhotos() {
-        photoCount.textContent = `${draftPhotos.length}`;
-        photoGrid.innerHTML = draftPhotos
-          .map(
-            (photo, index) => `
-              <article class="admin-photo-card">
-                <img src="${escapeHtml(photo)}" alt="Foto ${index + 1}" loading="lazy" decoding="async" onerror="this.closest('.admin-photo-card').classList.add('has-broken-image')" />
-                <div>
-                  <button class="button neutral" type="button" data-photo-action="cover" data-photo-index="${index}" ${index === 0 ? "disabled" : ""}>Principal</button>
-                  <button class="button danger" type="button" data-photo-action="remove" data-photo-index="${index}">Quitar</button>
-                </div>
-              </article>
-            `
-          )
-          .join("");
-      }
-
-      function fillForm(property) {
-        if (!property) {
-          form.hidden = true;
-          return;
-        }
-        form.hidden = false;
-        form.elements.id.value = property.id;
-        form.elements.title.value = property.title || "";
-        form.elements.address.value = property.address || "";
-        form.elements.city.value = property.city || "";
-        form.elements.state.value = property.state || "";
-        form.elements.zip.value = property.zip || "";
-        form.elements.bedrooms.value = property.bedrooms ?? "";
-        form.elements.bathrooms.value = property.bathrooms ?? "";
-        form.elements.sqft.value = property.sqft ?? "";
-        form.elements.rent.value = property.rent ?? "";
-        form.elements.zillowUrl.value = property.zillowUrl || "";
-        form.elements.descriptionEn.value = property.description.en || "";
-        form.elements.descriptionEs.value = property.description.es || "";
-        draftPhotos = [...(property.photos || [])];
-        editorTitle.textContent = property.title || "Propiedad";
-        viewPropertyLink.href = `property.html?id=${encodeURIComponent(property.id)}`;
-        renderPhotos();
-      }
-
-      function render() {
-        if (!selectedId && properties[0]) selectedId = properties[0].id;
-        renderList();
-        fillForm(currentProperty());
-      }
-
-      function collectProperty() {
-        const formData = new FormData(form);
-        const title = String(formData.get("title") || "").trim();
-        const address = String(formData.get("address") || "").trim();
-        const photos = propertiesApi.uniquePhotos(draftPhotos);
-
-        return propertiesApi.normalize({
-          id: String(formData.get("id") || `manual-${Date.now()}`),
-          title: title || address || "Nueva casa",
-          address,
-          city: formData.get("city"),
-          state: formData.get("state"),
-          zip: formData.get("zip"),
-          bedrooms: formData.get("bedrooms"),
-          bathrooms: formData.get("bathrooms"),
-          sqft: formData.get("sqft"),
-          rent: formData.get("rent"),
-          image: photos[0] || "assets/property-hero.jpg",
-          fallbackImage: photos[0] || "assets/property-hero.jpg",
-          photos: photos.length ? photos : ["assets/property-hero.jpg"],
-          description: {
-            en: formData.get("descriptionEn"),
-            es: formData.get("descriptionEs")
-          },
-          zillowUrl: formData.get("zillowUrl")
-        });
-      }
-
-      function addDraftPhotos(photos) {
-        const basePhotos = draftPhotos.length === 1 && draftPhotos[0] === "assets/property-hero.jpg" ? [] : draftPhotos;
-        draftPhotos = propertiesApi.uniquePhotos([...basePhotos, ...photos]);
-      }
-
-      function imageFileToDataUrl(file) {
-        return new Promise((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onerror = () => reject(new Error("No se pudo leer la foto."));
-          reader.onload = () => {
-            const image = new Image();
-            image.onerror = () => reject(new Error("Formato de foto no compatible."));
-            image.onload = () => {
-              const maxSize = 1400;
-              const scale = Math.min(1, maxSize / Math.max(image.width, image.height));
-              const canvas = document.createElement("canvas");
-              canvas.width = Math.max(1, Math.round(image.width * scale));
-              canvas.height = Math.max(1, Math.round(image.height * scale));
-              const context = canvas.getContext("2d");
-              context.drawImage(image, 0, 0, canvas.width, canvas.height);
-              resolve(canvas.toDataURL("image/jpeg", 0.72));
-            };
-            image.src = reader.result;
-          };
-          reader.readAsDataURL(file);
-        });
-      }
-
-      propertyList.addEventListener("click", (event) => {
-        const button = event.target.closest("[data-property-id]");
-        if (!button) return;
-        selectedId = button.getAttribute("data-property-id");
-        setStatus("");
-        render();
+      document.querySelector("#sign-out-button").addEventListener("click", async () => {
+        if (window.supabaseClient) await window.supabaseClient.auth.signOut();
+        window.location.href = "login.html?redirect=admin.html";
       });
-
-      form.addEventListener("submit", (event) => {
-        event.preventDefault();
-        const property = collectProperty();
-        const existingIndex = properties.findIndex((item) => item.id === property.id);
-        if (existingIndex >= 0) {
-          properties[existingIndex] = property;
-        } else {
-          properties.push(property);
-        }
-        selectedId = property.id;
-        if (saveProperties("Casa guardada.")) render();
-      });
-
-      newPropertyButton.addEventListener("click", () => {
-        const property = buildEmptyProperty();
-        properties.push(property);
-        selectedId = property.id;
-        saveProperties("Nueva casa creada.");
-        render();
-      });
-
-      deleteButton.addEventListener("click", () => {
-        const property = currentProperty();
-        if (!property) return;
-        const confirmed = confirm(`Quitar ${property.title}?`);
-        if (!confirmed) return;
-        properties = properties.filter((item) => item.id !== property.id);
-        selectedId = properties[0] ? properties[0].id : "";
-        saveProperties("Casa quitada.");
-        render();
-      });
-
-      resetButton.addEventListener("click", () => {
-        const confirmed = confirm("Restaurar la lista original? Esto quita cambios guardados en este navegador.");
-        if (!confirmed) return;
-        propertiesApi.reset();
-        properties = propertiesApi.load(propertiesApi.defaultProperties);
-        selectedId = properties[0] ? properties[0].id : "";
-        setStatus("Lista original restaurada.");
-        render();
-      });
-
-      exportButton.addEventListener("click", () => {
-        const property = collectProperty();
-        const existingIndex = properties.findIndex((item) => item.id === property.id);
-        if (existingIndex >= 0) properties[existingIndex] = property;
-        const data = JSON.stringify(properties.map(propertiesApi.normalize), null, 2);
-        const blob = new Blob([data], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = "nj-propiedades-respaldo.json";
-        link.click();
-        URL.revokeObjectURL(url);
-        setStatus("Respaldo exportado.");
-      });
-
-      importFile.addEventListener("change", async () => {
-        const file = importFile.files[0];
-        if (!file) return;
-        try {
-          const text = await file.text();
-          const imported = JSON.parse(text);
-          if (!Array.isArray(imported)) throw new Error("El archivo no contiene una lista.");
-          properties = imported.map(propertiesApi.normalize);
-          selectedId = properties[0] ? properties[0].id : "";
-          saveProperties("Respaldo importado.");
-          render();
-        } catch {
-          setStatus("No se pudo importar ese respaldo.", true);
-        } finally {
-          importFile.value = "";
-        }
-      });
-
-      photoFiles.addEventListener("change", async () => {
-        const files = [...photoFiles.files].filter((file) => file.type.startsWith("image/"));
-        if (!files.length) return;
-        setStatus("Procesando fotos...");
-        try {
-          const photos = [];
-          for (const file of files) {
-            photos.push(await imageFileToDataUrl(file));
-          }
-          addDraftPhotos(photos);
-          renderPhotos();
-          setStatus("Fotos agregadas. Guarda los cambios para publicarlas.");
-        } catch {
-          setStatus("No se pudieron agregar algunas fotos.", true);
-        } finally {
-          photoFiles.value = "";
-        }
-      });
-
-      addPhotoUrl.addEventListener("click", () => {
-        const url = photoUrl.value.trim();
-        if (!url) return;
-        addDraftPhotos([url]);
-        photoUrl.value = "";
-        renderPhotos();
-        setStatus("Enlace agregado. Guarda los cambios para publicarlo.");
-      });
-
-      photoGrid.addEventListener("click", (event) => {
-        const button = event.target.closest("[data-photo-action]");
-        if (!button) return;
-        const index = Number(button.getAttribute("data-photo-index"));
-        const action = button.getAttribute("data-photo-action");
-        if (action === "remove") {
-          draftPhotos.splice(index, 1);
-        }
-        if (action === "cover" && index > 0) {
-          const [photo] = draftPhotos.splice(index, 1);
-          draftPhotos.unshift(photo);
-        }
-        renderPhotos();
-      });
-
-      render();
-      }
 
       async function initPendingApprovals() {
         const remote = window.NJRemoteProperties;
@@ -614,6 +146,7 @@
             .from("properties")
             .select("*")
             .eq("approved", false)
+            .eq("rejected", false)
             .order("created_at", { ascending: false });
           if (error) {
             pendingStatus.textContent = "No se pudieron cargar las solicitudes.";
@@ -622,6 +155,7 @@
           }
           const pending = (data || []).map(remote.mapRow);
           pendingStatus.textContent = pending.length ? `${pending.length} solicitud(es) pendiente(s).` : "No hay solicitudes pendientes.";
+          document.title = pending.length ? `(${pending.length}) Admin | NJ Remodeling and Rental` : "Admin | NJ Remodeling and Rental";
           pendingList.innerHTML = pending
             .map((property) => {
               const cover = property.photos[0] || property.fallbackImage;
@@ -647,14 +181,17 @@
           const rejectButton = event.target.closest("[data-reject]");
           if (approveButton) {
             const id = approveButton.getAttribute("data-approve");
-            await client.from("properties").update({ approved: true }).eq("id", id);
+            await client.from("properties").update({ approved: true, rejected: false, rejection_reason: "" }).eq("id", id);
             await loadPending();
           }
           if (rejectButton) {
             const id = rejectButton.getAttribute("data-reject");
-            const confirmed = confirm("Rechazar y borrar esta solicitud?");
-            if (!confirmed) return;
-            await client.from("properties").delete().eq("id", id);
+            const reason = prompt("Motivo del rechazo (el usuario lo vera en su panel):", "");
+            if (reason === null) return;
+            await client
+              .from("properties")
+              .update({ approved: false, rejected: true, rejection_reason: String(reason).trim() })
+              .eq("id", id);
             await loadPending();
           }
         });
@@ -705,7 +242,67 @@
           }
         });
 
+        // ===== Mensajes del formulario de contacto (tabla leads) =====
+        const leadsStatus = document.querySelector("#leads-status");
+        const leadsList = document.querySelector("#leads-list");
+        const leadsRefresh = document.querySelector("#leads-refresh");
+
+        async function loadLeads() {
+          leadsStatus.textContent = "Cargando mensajes...";
+          leadsStatus.classList.remove("is-error");
+          const { data, error } = await client
+            .from("leads")
+            .select("*")
+            .order("created_at", { ascending: false })
+            .limit(100);
+          if (error) {
+            leadsStatus.textContent = "No se pudieron cargar los mensajes. Verifica que corriste supabase/actualizacion-mejoras.sql.";
+            leadsStatus.classList.add("is-error");
+            return;
+          }
+          const leads = data || [];
+          const nuevos = leads.filter((lead) => !lead.handled).length;
+          leadsStatus.textContent = leads.length
+            ? `${leads.length} mensaje(s), ${nuevos} sin atender.`
+            : "No hay mensajes todavia.";
+          leadsList.innerHTML = leads
+            .map((lead) => {
+              const fecha = new Date(lead.created_at).toLocaleString("es-US");
+              return `
+                <article class="admin-pending-item" style="${lead.handled ? "opacity:0.6;" : ""}">
+                  <span>
+                    <strong>${escapeHtml(lead.name)} &middot; ${escapeHtml(lead.contact)}</strong>
+                    <small>${escapeHtml(fecha)} &middot; ${escapeHtml(lead.need)}</small>
+                    <small>${escapeHtml(lead.message)}</small>
+                  </span>
+                  <div class="admin-pending-item-actions">
+                    ${lead.handled ? "" : `<button class="button primary" type="button" data-lead-done="${escapeHtml(lead.id)}">Atendido</button>`}
+                    <button class="button danger" type="button" data-lead-delete="${escapeHtml(lead.id)}">Borrar</button>
+                  </div>
+                </article>
+              `;
+            })
+            .join("");
+        }
+
+        leadsList.addEventListener("click", async (event) => {
+          const doneButton = event.target.closest("[data-lead-done]");
+          const deleteButton = event.target.closest("[data-lead-delete]");
+          if (doneButton) {
+            await client.from("leads").update({ handled: true }).eq("id", doneButton.getAttribute("data-lead-done"));
+            await loadLeads();
+          }
+          if (deleteButton) {
+            if (!confirm("Borrar este mensaje?")) return;
+            await client.from("leads").delete().eq("id", deleteButton.getAttribute("data-lead-delete"));
+            await loadLeads();
+          }
+        });
+
+        leadsRefresh.addEventListener("click", loadLeads);
+
         await loadPending();
+        await loadLeads();
       }
     </script>
   </body>

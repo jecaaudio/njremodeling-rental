@@ -10,7 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="icon" type="image/png" href="assets/favicon.png" />
     <link rel="apple-touch-icon" href="assets/favicon.png" />
-    <link rel="stylesheet" href="styles.min.css" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="site-nav.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script src="supabase-config.js"></script>
     <script src="properties-remote.js"></script>
@@ -308,6 +309,7 @@
             </div>
             <span class="status-badge" id="editor-status-badge"></span>
           </div>
+          <p class="dash-status" id="editor-note" hidden></p>
 
           <form class="dash-form" id="property-form" hidden>
             <input type="hidden" name="id" />
@@ -494,7 +496,9 @@
               const isActive = property.dbId === selectedId ? " is-active" : "";
               const badge = property.approved
                 ? '<span class="status-badge is-approved">Live</span>'
-                : '<span class="status-badge is-pending">Pending</span>';
+                : property.rejected
+                  ? '<span class="status-badge is-pending" style="background:#5a1f1f;color:#ffb3b3;">Rejected</span>'
+                  : '<span class="status-badge is-pending">Pending</span>';
               return `
                 <button class="dash-prop-item${isActive}" type="button" data-property-id="${escapeHtml(property.dbId)}">
                   <img src="${escapeHtml(cover)}" alt="" onerror="this.style.visibility='hidden'" />
@@ -549,8 +553,23 @@
           form.elements.descriptionEs.value = property.description.es || "";
           draftPhotos = [...(property.photos || [])];
           editorTitle.textContent = property.title || "Property";
-          editorBadge.textContent = property.approved ? "Live" : "Pending review";
+          editorBadge.textContent = property.approved ? "Live" : property.rejected ? "Rejected" : "Pending review";
           editorBadge.className = `status-badge ${property.approved ? "is-approved" : "is-pending"}`;
+          const editorNote = document.querySelector("#editor-note");
+          if (property.rejected) {
+            editorNote.hidden = false;
+            editorNote.classList.add("is-error");
+            editorNote.textContent = property.rejectionReason
+              ? `This listing was rejected: "${property.rejectionReason}". Fix it and save to submit it again.`
+              : "This listing was rejected. Fix it and save to submit it for review again.";
+          } else if (property.approved) {
+            editorNote.hidden = false;
+            editorNote.classList.remove("is-error");
+            editorNote.textContent = "This listing is live. Saving changes will send it back for admin review before they appear publicly.";
+          } else {
+            editorNote.hidden = true;
+            editorNote.textContent = "";
+          }
           renderPhotos();
         }
 
@@ -602,7 +621,7 @@
           draftPhotos = remote.uniquePhotos([...basePhotos, ...photos]);
         }
 
-        function imageFileToDataUrl(file) {
+        function imageFileToBlob(file) {
           return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onerror = () => reject(new Error("Could not read photo."));
@@ -617,12 +636,31 @@
                 canvas.height = Math.max(1, Math.round(image.height * scale));
                 const context = canvas.getContext("2d");
                 context.drawImage(image, 0, 0, canvas.width, canvas.height);
-                resolve(canvas.toDataURL("image/jpeg", 0.72));
+                canvas.toBlob(
+                  (blob) => (blob ? resolve(blob) : reject(new Error("Could not compress photo."))),
+                  "image/jpeg",
+                  0.72
+                );
               };
               image.src = reader.result;
             };
             reader.readAsDataURL(file);
           });
+        }
+
+        // Sube la foto (ya comprimida) a Supabase Storage y regresa su URL publica.
+        // Asi la base de datos solo guarda direcciones, no archivos.
+        async function uploadPhoto(file) {
+          const blob = await imageFileToBlob(file);
+          const random = Math.random().toString(36).slice(2, 8);
+          const path = `${userId}/${Date.now()}-${random}.jpg`;
+          const { error } = await client.storage
+            .from("property-photos")
+            .upload(path, blob, { contentType: "image/jpeg", upsert: false });
+          if (error) throw error;
+          const { data } = client.storage.from("property-photos").getPublicUrl(path);
+          if (!data || !data.publicUrl) throw new Error("Could not get photo URL.");
+          return data.publicUrl;
         }
 
         propertyList.addEventListener("click", (event) => {
@@ -648,6 +686,8 @@
 
           if (selectedId) {
             row.approved = false;
+            row.rejected = false;
+            row.rejection_reason = "";
             const { error } = await client.from("properties").update(row).eq("id", selectedId);
             if (error) { setStatus("Could not save changes.", true); return; }
             setStatus("Saved. Submitted for review again.");
@@ -674,15 +714,17 @@
         photoFiles.addEventListener("change", async () => {
           const files = [...photoFiles.files].filter((file) => file.type.startsWith("image/"));
           if (!files.length) return;
-          setStatus("Processing photos...");
           try {
             const photos = [];
-            for (const file of files) photos.push(await imageFileToDataUrl(file));
+            for (let i = 0; i < files.length; i += 1) {
+              setStatus(`Uploading photo ${i + 1} of ${files.length}...`);
+              photos.push(await uploadPhoto(files[i]));
+            }
             addDraftPhotos(photos);
             renderPhotos();
-            setStatus("Photos added. Save to submit them.");
-          } catch {
-            setStatus("Could not add some photos.", true);
+            setStatus("Photos uploaded. Save to submit them.");
+          } catch (error) {
+            setStatus("Could not upload some photos. Make sure supabase/actualizacion-mejoras.sql was run.", true);
           } finally {
             photoFiles.value = "";
           }

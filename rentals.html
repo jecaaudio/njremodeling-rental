@@ -23,11 +23,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
     <link rel="icon" type="image/png" href="assets/favicon.png" />
     <link rel="apple-touch-icon" href="assets/favicon.png" />
-    <link rel="stylesheet" href="styles.min.css" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="site-nav.js" defer></script>
     <script src="properties-data.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script src="supabase-config.js"></script>
     <script src="properties-remote.js"></script>
+    <!-- ANALITICAS (opcional): para saber cuanta gente visita el sitio.
+         1. Crea una cuenta gratis en https://analytics.google.com
+         2. Copia tu ID de medicion (empieza con G-)
+         3. Quita los comentarios de las 2 lineas de abajo y pon tu ID.
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-TUCODIGO"></script>
+    <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)};gtag('js',new Date());gtag('config','G-TUCODIGO');</script>
+    -->
   </head>
   <body>
     <header class="site-header">
@@ -146,6 +154,14 @@
               <span data-i18n="budgetLabel">Max budget</span>
               <input type="text" name="budget" placeholder="Optional" data-i18n-placeholder="budgetPlaceholder" />
             </label>
+            <label>
+              <span data-i18n="sortLabel">Sort by</span>
+              <select id="sort-select">
+                <option value="newest" data-i18n="sortNewest">Newest first</option>
+                <option value="priceAsc" data-i18n="sortPriceAsc">Price: low to high</option>
+                <option value="priceDesc" data-i18n="sortPriceDesc">Price: high to low</option>
+              </select>
+            </label>
             <button class="button primary" type="submit" data-i18n="filterSubmit">Show matching rentals</button>
             <button class="button neutral" type="button" id="clear-filters" data-i18n="clearFilters">Clear filters</button>
           </form>
@@ -157,6 +173,9 @@
             <h2 id="results-title">Available properties</h2>
           </div>
           <div class="property-grid rentals-results-grid" id="rentals-results-grid"></div>
+          <div style="text-align:center;margin-top:18px;">
+            <button class="button neutral" type="button" id="show-more" hidden data-i18n="showMore">Show more properties</button>
+          </div>
           <div class="empty-results" id="empty-results" hidden>
             <h3 data-i18n="emptyTitle">No published matches yet.</h3>
             <p data-i18n="emptyCopy">
@@ -203,6 +222,11 @@
           resultsTitle: "Available properties",
           matchCount: "matching rentals",
           allCount: "properties in inventory",
+          sortLabel: "Sort by",
+          sortNewest: "Newest first",
+          sortPriceAsc: "Price: low to high",
+          sortPriceDesc: "Price: high to low",
+          showMore: "Show more properties",
           detailsPending: "Details pending",
           privateCopy: "Public photos, rent, bedrooms, bathrooms, and address need to be added before this listing is fully searchable.",
           viewZillow: "Open Zillow link",
@@ -244,6 +268,11 @@
           resultsTitle: "Propiedades disponibles",
           matchCount: "rentas compatibles",
           allCount: "propiedades en inventario",
+          sortLabel: "Ordenar por",
+          sortNewest: "Mas recientes primero",
+          sortPriceAsc: "Precio: menor a mayor",
+          sortPriceDesc: "Precio: mayor a menor",
+          showMore: "Mostrar mas propiedades",
           detailsPending: "Detalles pendientes",
           privateCopy: "Faltan fotos públicas, renta, habitaciones, baños y dirección para que esta propiedad sea totalmente filtrable.",
           viewZillow: "Abrir enlace de Zillow",
@@ -267,6 +296,20 @@
       let rentals = window.NJProperties.load(window.NJProperties.defaultProperties);
 
       const filterForm = document.querySelector("#rentals-filter-form");
+      const sortSelect = document.querySelector("#sort-select");
+      const showMoreButton = document.querySelector("#show-more");
+      const PAGE_SIZE = 12;
+      let visibleCount = PAGE_SIZE;
+
+      sortSelect.addEventListener("change", () => {
+        visibleCount = PAGE_SIZE;
+        renderRentals();
+      });
+
+      showMoreButton.addEventListener("click", () => {
+        visibleCount += PAGE_SIZE;
+        renderRentals();
+      });
       const resultsGrid = document.querySelector("#rentals-results-grid");
       const emptyResults = document.querySelector("#empty-results");
       const emptyRequestLink = document.querySelector("#empty-request-link");
@@ -366,10 +409,24 @@
         const hasFilters = Boolean(filters.city || filters.state || filters.bedrooms || filters.budget);
         const visibleRentals = hasFilters ? rentals.filter((property) => propertyMatches(property, filters)) : [...rentals];
 
+        // Ordenar segun la opcion elegida.
+        const sortValue = sortSelect ? sortSelect.value : "newest";
+        if (sortValue === "priceAsc") {
+          visibleRentals.sort((a, b) => (a.rent ?? Infinity) - (b.rent ?? Infinity));
+        } else if (sortValue === "priceDesc") {
+          visibleRentals.sort((a, b) => (b.rent ?? -1) - (a.rent ?? -1));
+        } else {
+          visibleRentals.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+        }
+
         resultsTitle.textContent = `${visibleRentals.length} ${hasFilters ? dictionary.matchCount : dictionary.allCount}`;
         resultsGrid.innerHTML = "";
 
-        visibleRentals.forEach((property) => {
+        // Paginacion sencilla: mostrar de 12 en 12.
+        const pageRentals = visibleRentals.slice(0, visibleCount);
+        showMoreButton.hidden = visibleRentals.length <= visibleCount;
+
+        pageRentals.forEach((property) => {
           const card = document.createElement("article");
           card.className = "property-card";
           const meta = `${property.city}, ${property.state} ${property.zip}`;
@@ -455,6 +512,7 @@
       }
 
       filterForm.addEventListener("submit", (event) => {
+        visibleCount = PAGE_SIZE;
         event.preventDefault();
         const filters = getFilters();
         const params = new URLSearchParams();
@@ -467,6 +525,7 @@
       });
 
       document.querySelector("#clear-filters").addEventListener("click", () => {
+        visibleCount = PAGE_SIZE;
         filterForm.reset();
         history.replaceState(null, "", window.location.pathname);
         renderRentals();
@@ -490,5 +549,9 @@
       applyLanguage(currentLanguage);
       refreshFromSupabase();
     </script>
+    <a class="whatsapp-float" href="https://wa.me/15025540333?text=Hola%2C%20vi%20su%20pagina%20de%20rentas%20y%20me%20interesa%20una%20propiedad." target="_blank" rel="noopener" aria-label="WhatsApp 502-554-0333">
+      <svg viewBox="0 0 32 32" fill="currentColor" aria-hidden="true"><path d="M16 3C9.4 3 4 8.4 4 15c0 2.1.6 4.2 1.7 6L4 29l8.2-1.6c1.2.6 2.5.9 3.8.9 6.6 0 12-5.4 12-12S22.6 3 16 3zm0 21.8c-1.2 0-2.4-.3-3.5-.9l-.3-.1-4.9 1 1-4.7-.2-.3c-1-1.6-1.5-3.4-1.5-5.3 0-5.2 4.2-9.4 9.4-9.4s9.4 4.2 9.4 9.4-4.2 9.3-9.4 9.3zm5.2-7c-.3-.1-1.7-.8-1.9-.9-.3-.1-.5-.1-.7.1-.2.3-.8.9-.9 1.1-.2.2-.3.2-.6.1-.3-.1-1.2-.4-2.3-1.4-.8-.8-1.4-1.7-1.6-2-.2-.3 0-.4.1-.6l.4-.5c.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.1c-.2-.5-.4-.5-.6-.5h-.5c-.2 0-.5.1-.7.3-.2.3-.9.9-.9 2.2s1 2.6 1.1 2.7c.1.2 1.9 2.9 4.6 4.1.6.3 1.1.4 1.5.6.6.2 1.2.2 1.6.1.5-.1 1.7-.7 1.9-1.3.2-.7.2-1.2.2-1.3-.1-.2-.3-.2-.6-.4z"/></svg>
+      <span>WhatsApp</span>
+    </a>
   </body>
 </html>
