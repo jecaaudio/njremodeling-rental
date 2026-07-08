@@ -15,6 +15,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
     <script src="supabase-config.js"></script>
     <script src="properties-remote.js"></script>
+    <script src="us-locations.js"></script>
     <style>
       /* ── Dashboard banner ── */
       .dash-banner {
@@ -167,6 +168,7 @@
         color: var(--ink);
       }
       .dash-form input,
+      .dash-form select,
       .dash-form textarea {
         border: 1px solid var(--line);
         border-radius: 7px;
@@ -178,6 +180,7 @@
         transition: border-color 0.15s, background 0.15s;
       }
       .dash-form input:focus,
+      .dash-form select:focus,
       .dash-form textarea:focus {
         outline: none;
         border-color: var(--green);
@@ -325,12 +328,13 @@
                 <input type="text" name="address" placeholder="123 Main St" required />
               </label>
               <label>
-                <span>City</span>
-                <input type="text" name="city" placeholder="Louisville" required />
+                <span>State</span>
+                <select name="state" id="state-select" required></select>
               </label>
               <label>
-                <span>State</span>
-                <input type="text" name="state" maxlength="2" placeholder="KY" required />
+                <span>City</span>
+                <input type="text" name="city" list="city-options" placeholder="Louisville" autocomplete="off" required />
+                <datalist id="city-options"></datalist>
               </label>
               <label>
                 <span>ZIP</span>
@@ -459,6 +463,14 @@
         const photoCount = document.querySelector("#photo-count");
         const photoGrid = document.querySelector("#photo-grid");
         const form = document.querySelector("#property-form");
+        // Estados y ciudades de EE.UU.
+        window.wireUsLocationFields(
+          form.elements.state,
+          form.elements.city,
+          document.querySelector("#city-options")
+        );
+        form.elements.state.value = "KY";
+        form.elements.state.dispatchEvent(new Event("change"));
         const editorEmpty = document.querySelector("#editor-empty");
         const editorTitle = document.querySelector("#editor-title");
         const editorBadge = document.querySelector("#editor-status-badge");
@@ -559,7 +571,8 @@
           form.elements.title.value = property.title || "";
           form.elements.address.value = property.address || "";
           form.elements.city.value = property.city || "";
-          form.elements.state.value = property.state || "";
+          form.elements.state.value = property.state || "KY";
+          form.elements.state.dispatchEvent(new Event("change"));
           form.elements.zip.value = property.zip || "";
           form.elements.bedrooms.value = property.bedrooms ?? "";
           form.elements.bathrooms.value = property.bathrooms ?? "";
